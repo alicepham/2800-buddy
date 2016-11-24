@@ -7,6 +7,12 @@ type direction = Left | Right
  * of gamma*)
 type gamma = Blank of string| Sigma of int list
 
+(*State is the state of the Turing Machine*)
+type state = Q of int
+
+(*Symbol represents the language written to the tape*)
+type symbol = Blank | Sigma of int
+
 (* The transition function describes movement along the tape.
  * The function moves from (state, sigma) -> (state, sigma, direction)
  * producing the new state, the overwritten symbol and the direction moved
@@ -15,9 +21,9 @@ type transition_function = string * gamma * direction list list
 
 (* Type machine maintains all data necessary for a working Turing
  * machine*)
-type machine = {all_states : string list ; prev_state : string ;
-               curr_state: string; next_state : string ; sigma : int list ;
-               tape_symbol_read : int}
+type machine = {all_states : state list ; prev_state : state ;
+               curr_state: state; next_state : state ; alphabet : int list ;
+               tape_symbol_read : symbol}
 
 (* [step machine num] Takes a [machine] and steps the configuration the desired
  * number [num] of times, returning the transformed machine.   *)
