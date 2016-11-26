@@ -21,6 +21,20 @@ open Main_gui
 
 
 (* Create FSM in initial state *)
+let font_name = "-*-helvetica-medium-r-normal-*-120-*"
+
+let font =
+  try
+    Gdk.Font.load font_name
+  with
+    Gpointer.Null -> failwith ("font " ^ font_name ^ ": not found")
+
+
+(* Draw Text on drawable object *)
+let draw_text drawable (x, y) text =
+  let string_width = Gdk.Font.string_width font text in
+  let string_height = Gdk.Font.string_height font text in
+  drawable#string text ~font ~x:(x - string_width/2) ~y:(y+string_height)
 
 (* Filled, black-outlined rectangle. *)
 let draw_rectangle (drawable : GDraw.drawable)
@@ -68,21 +82,31 @@ class fsm (status : Main_gui.machine ) ?packing ?show ?width ?height ?packing ?s
       let state_num = List.length status.all_states in
       let tot_state_area = width_i*height_i/2 in
       let state_area = tot_state_area/state_num in
-      (* Problem: Need operator - Square-root of state_area *)
+      (*  *)
       let state_length = state_area |> float_of_int |> sqrt |> int_of_float in
 
       (* Draw Rectangles on screen - x/y-coordinates + color *)
-      let a = int_of_float(0.1*.float_of_int(width_i)) in
-      let b =  int_of_float(0.1*.float_of_int(height_i)) in
+      let a = int_of_float(0.1*.float_width_i) in
+      let b =  int_of_float(0.1*.float_height_i) in
 
 
       for n = 0 to (state_num - 1) do
 
-         (* Still to do - color, (a, b) coordinates *)
+        (* Current State in Loop *)
+        let l_state = List.nth status.all_states n in
+        let l_string_state = match l_state with
+                             | Q x -> "Q" ^ string_of_int(x) in
 
-        draw_rectangle drawable_i "aqua" (a, b) state_length ;
+        (* Draw Rectangle *)
+        if l_state = status.curr_state then
+        draw_rectangle drawable_i "Spring Green" (a, b) state_length
+        else
+        draw_rectangle drawable_i "Medium Blue" (a, b) state_length ;
 
         (* Draw Text *)
+        draw_text drawable_i (a, b) l_string_state ;
+
+
         let float_a = float_of_int(a) in
         let float_b = float_of_int(b) in
 
@@ -98,16 +122,8 @@ class fsm (status : Main_gui.machine ) ?packing ?show ?width ?height ?packing ?s
 
       done
 
-
-
-
-
-
-    (* - Draw Rectangle
-       - Label Rectangles
-       - Position Rectangles on the screen
-       - Changing colors
-     *)
+    (* method step () =
+       let *)
 
 
 
