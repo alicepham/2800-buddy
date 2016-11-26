@@ -23,6 +23,8 @@ On Linux, I believe the equivalent for brew is `apt-get`
 
 Then navigate to the directory where `gui.ml` is and run:
 
-`ocamlfind ocamlc -g -package lablgtk2 -linkpkg gui.ml -o gui`
+1. `ocamlfind ocamlc -g -package lablgtk2 -linkpkg gui.ml -o gui`
+2. `./gui`
+
 
 
