@@ -13,7 +13,9 @@ In this project, we attempt to create an animated turing machine using OCAML. We
 ##How to run:
 
 To run gui.ml, first install gtk and lablGTK2.
+
 On Mac, 
+
 1. `brew install gtk+ or brew install gtk`
 2. `opam install lablgtk`
 
