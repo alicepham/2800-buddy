@@ -72,11 +72,19 @@ let step packing () =
   let _ = (!next_entry)#set_has_frame true in
   let _ = current := (!current + 1) in
     () 
+
+(* [make_turing_machine packing s] does three things:
+ * 1) creates a table for the turing machine 
+ * 2) creates each of the individual tape cells and adds to table 
+ * 3) adds each cell to a global [turing_machine] variable so each 
+ *    cell can be accessed/manipulated later 
+ *)
 let make_turing_machine packing (s:string) =
   let turing_table = GPack.table ~rows: 1 ~columns: ((String.length s)+3) 
   ~row_spacings:10 ~col_spacings:10 ~packing () in 
-  let turnstile = ref (GEdit.entry ~width: 50 ~height: 50 ~has_frame: true
-    ~text:"T" ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in
+  let turnstile = 
+    ref (GEdit.entry ~width: 50 ~height: 50 ~has_frame: true ~text:"T" 
+      ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in
   let _ = turing_machine := turnstile::!turing_machine in
   for i = 0 to ((String.length s)-1) do
     turing_machine := ref(GEdit.entry ~width: 50 ~height: 50 ~has_frame: false
@@ -86,44 +94,12 @@ let make_turing_machine packing (s:string) =
   let empty = ref (GEdit.entry ~width: 50 ~height: 50 ~has_frame: false
     ~text:"empty" ~packing:(turing_table #attach ~left:((String.length s)+2) 
       ~top:0 ~expand:`NONE) ()) in
-  (* let _ = (!empty)#set_has_frame true in *)
-
-(*   (GEdit.entry ~width: 50 ~height: 50 ~has_frame: true ~text:"changed"
-    ~packing: (!empty)?packing ())  *)
   let _ = turing_machine := empty::!turing_machine in
   let _ = turing_machine := List.rev !turing_machine in
 (*   let _ = empty := ((GEdit.entry ~width: 50 ~height: 50 ~has_frame: false
     ~text:"emp" ~packing:(turing_table #attach ~left:((String.length s)+2) 
       ~top:0 ~expand:`NONE) ())) in (*this works!!!!! :DDDD*) *)
   ()
-  
-  (* let text_holder = GPack.hbox ~height: 50 ~width: 50 ~packing: 
-    (turing_table #attach ~left:1 ~top: 0 ~expand: `BOTH) () in *)
-  (* let a = !input_t1 in *)
-
-  (* let _ = input_t1 := (GEdit.entry ~width: 50 ~height: 50) in *)
-    (* ~text:"M" ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in *)
-(*   let input_t1 = ref (GEdit.entry ~width: 50 ~height: 50 ~text:"T" 
-    ~editable: false 
-      ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in
-  let input_t2 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"a" ~packing:(turing_table #attach ~left:2 ~top:0 ~expand:`NONE) () in
-  let input_t3 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"b" ~packing:(turing_table #attach ~left:3 ~top:0 ~expand:`NONE) () in
-  let input_t4 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"a" ~packing:(turing_table #attach ~left:4 ~top:0 ~expand:`NONE) () in
-  let input_t5 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"a" ~packing:(turing_table #attach ~left:5 ~top:0 ~expand:`NONE) () in
-  let input_t6 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"a" ~packing:(turing_table #attach ~left:6 ~top:0 ~expand:`NONE) () in
-  let input_t7 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"U" ~packing:(turing_table #attach ~left:7 ~top:0 ~expand:`NONE) () in
-  let input_t8 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"U" ~packing:(turing_table #attach ~left:8 ~top:0 ~expand:`NONE) () in
-(*   let box_entry_str = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10 
-    ~homogeneous: true ~packing: input_str_frame#add  () in *)
-  let box_step = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10  
-    ~packing: box_turing#pack () in *)
 
 (*[make_matrix packing rows cols] creates a transition matrix in the GUI*)
 let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
@@ -147,30 +123,10 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
     GButton.toggle_button ~label:("input "^(string_of_int (m-1)))
     ~packing:(table #attach ~left: m ~top: 0 ~expand: `BOTH) ()
   done;
-(*   let input_1 = GButton.toggle_button ~label:("input 1")
-    ~packing:(table #attach ~left:1 ~top:0 ~expand:`BOTH) () in
-  let input_2 = GButton.toggle_button ~label:("input 2")
-    ~packing:(table #attach ~left:2 ~top:0 ~expand:`BOTH) () in
-  let input_1 = GButton.toggle_button ~label:("input 3")
-    ~packing:(table #attach ~left:3 ~top:0 ~expand:`BOTH) () in *)
   for n = 1 to rows do
     GButton.toggle_button ~label:("q_"^(string_of_int (n-1)))
     ~packing:(table #attach ~left: 0 ~top: n ~expand: `BOTH) ()
   done;
-(*   let state_1 = GButton.toggle_button ~label:("state 1")
-    ~packing:(table #attach ~left:0 ~top:1 ~expand:`BOTH) () in
-  let state_2 = GButton.toggle_button ~label:("state 2")
-    ~packing:(table #attach ~left:0 ~top:2 ~expand:`BOTH) () in  
-  let state_3 = GButton.toggle_button ~label:("state 3")
-    ~packing:(table #attach ~left:0 ~top:3 ~expand:`BOTH) () in 
-  let state_4 = GButton.toggle_button ~label:("state 4")
-    ~packing:(table #attach ~left:0 ~top:4 ~expand:`BOTH) () in
-  let state_5 = GButton.toggle_button ~label:("state 5")
-    ~packing:(table #attach ~left:0 ~top:5 ~expand:`BOTH) () in
-  let state_6 = GButton.toggle_button ~label:("state 6")
-    ~packing:(table #attach ~left:0 ~top:6 ~expand:`BOTH) () in 
-  let state_7 = GButton.toggle_button ~label:("state 7")
-    ~packing:(table #attach ~left:0 ~top:7 ~expand:`BOTH) () in  *)
   for i = 1 to (cols) do
     (* let y = [] *)
     for j=1 to (rows) do
@@ -178,10 +134,7 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
         (("q_"^(string_of_int (j-1)), "input "^(string_of_int i)),
         (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ()))
           ::(!transition_matrix)
-      (* GButton.toggle_button *)
-        (* ~label:("button ("^ string_of_int i ^","^ string_of_int j ^")\n") *)
     done
-    (* y@transition_matrix *)
   done;
   ()
 
@@ -242,67 +195,27 @@ let main () =
     (fun () -> prerr_endline entry_transition#text) ;
   let button_make_matrix = GButton.button ~label:"make matrix" 
     ~packing:box_make_matrix#add () in button_make_matrix#connect#clicked     
-    (fun () -> make_matrix box_trans_matrix#pack entry_num_states#text entry_num_input#text ["hello"]) ;
+    (fun () -> make_matrix box_trans_matrix#pack entry_num_states#text 
+      entry_num_input#text ["hello"]) ;
 
-  (* let _ = make_matrix vbox#pack 2 3 ["hello"] in   *)
-(*   for i = 1 to 19 do
-    for j=1 to 19 do
-      GEdit.entry *)
-      (* GButton.toggle_button *)
-        (* ~label:("button ("^ string_of_int i ^","^ string_of_int j ^")\n") *)
-        (* ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) () *)
-(*     done
-  done;
- *)
   (*for me to get the entries of each, i can save all of them 
   to a matrix then iterate through the entire matrix to get the values.*)
   let box_turing = GPack.vbox ~packing: vbox#pack () in
   let turing_frame = GBin.frame ~label:"Turing Machine" 
     ~packing:box_turing#pack () in
-(*   let table = GPack.table ~rows:20 ~columns:20 ~row_spacings:10
-      ~col_spacings:10 ~packing:scrolled_window#add_with_viewport () in *)
+
   let button_entry_str = GButton.button ~label:"input string" 
     ~packing:box_entry_str#add () in button_entry_str#connect#clicked     
     (fun () -> make_turing_machine turing_frame#add entry_string#text);
-(*   let turing_table = GPack.table ~rows: 1 ~columns: 5 ~row_spacings:10
-    ~col_spacings:10 ~packing:turing_frame#add () in *)
-  (* let text_holder = GPack.hbox ~height: 50 ~width: 50 ~packing: 
-    (turing_table #attach ~left:1 ~top: 0 ~expand: `BOTH) () in *)
-  (* let a = !input_t1 in *)
-
-  (* let _ = input_t1 := (GEdit.entry ~width: 50 ~height: 50) in *)
-    (* ~text:"M" ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in *)
-(*   let input_t1 = ref (GEdit.entry ~width: 50 ~height: 50 ~text:"T" 
-    ~editable: false 
-      ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in
-  let input_t2 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"a" ~packing:(turing_table #attach ~left:2 ~top:0 ~expand:`NONE) () in
-  let input_t3 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"b" ~packing:(turing_table #attach ~left:3 ~top:0 ~expand:`NONE) () in
-  let input_t4 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"a" ~packing:(turing_table #attach ~left:4 ~top:0 ~expand:`NONE) () in
-  let input_t5 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"a" ~packing:(turing_table #attach ~left:5 ~top:0 ~expand:`NONE) () in
-  let input_t6 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"a" ~packing:(turing_table #attach ~left:6 ~top:0 ~expand:`NONE) () in
-  let input_t7 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"U" ~packing:(turing_table #attach ~left:7 ~top:0 ~expand:`NONE) () in
-  let input_t8 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"U" ~packing:(turing_table #attach ~left:8 ~top:0 ~expand:`NONE) () in *)
-(*   let box_entry_str = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10 
-    ~homogeneous: true ~packing: input_str_frame#add  () in *)
   let box_step = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10  
     ~packing: box_turing#pack () in
 
-(*     let button_entry_num_states = GButton.button ~label:"input number of states" 
-    ~packing:box_entry_num_states#add () in button_entry_num_states#connect#clicked     
-    (fun () -> prerr_endline entry_transition#text) ;
- *)
-  (*this will be the step button*)
-  let button_step = GButton.button ~label: "step forward" ~packing: box_step#pack () in
-    button_step#connect#clicked (step ()); (* (fun () -> step ()  prerr_endline "next button pressed" );
- *)(*   (* Menu bar *)
-  let menubar = GMenu.menu_bar ~packing:vbox#pack () in
+
+  (*turing step button*)
+  let button_step = GButton.button ~label: "step forward" 
+    ~packing: box_step#pack () in button_step#connect#clicked (step ()); 
+  (* Menu bar *)
+  (*let menubar = GMenu.menu_bar ~packing:vbox#pack () in
   let factory = new GMenu.factory menubar in
   let accel_group = factory#accel_group in
   let file_menu = factory#add_submenu "File" in
@@ -311,15 +224,6 @@ let main () =
   let factory = new GMenu.factory file_menu ~accel_group in
   factory#add_item "Quit" ~key:_Q ~callback: Main.quit;
  *)
-  (* Button *)
-(*   let button = GButton.button ~label:"Next"
-                              ~packing:vbox#add () in
-  button#connect#clicked ~callback: (fun () -> prerr_endline "Ouch!");
-  let button1 = GButton.button ~label:"Previous"
-                              ~packing:vbox#add () in
-  button1#connect#clicked ~callback: (fun () -> prerr_endline "Ouch!");
- *)  (* let entry =  *)
-  (*call back function to print line*)
 
   (* Display the windows and enter Gtk+ main loop *)
   (* window#add_accel_group accel_group; *)
