@@ -5,13 +5,22 @@ let locale = GtkMain.Main.init ()
 
 type state = Q of int 
 
+type key = state * char
+
+type value = state * char * char
+
 (*initializing states*)
-let current_state = ref (Q 0)
-let next_state = ref (Q 0)
+let current_state = ref (Q 0, 'T')
+let next_state = ref (Q 0, 'T')
+let input_char = ref 'T'
+let current = ref 0
+
+(* let (turing_machine: (key * value) list ref) = ref [] *)
+let (turing_machine: (GEdit.entry ref) list ref) = ref []
 
 (* let turing_machine = ref [] *)
 (*transition matrix to hold list of lists*)
-let transition_matrix = ref []
+let (transition_matrix: ((string * string) * GEdit.entry) list ref) = ref []
 
 let setup packing (make_entry : (GObj.widget -> unit) -> GEdit.entry) =
   let box = GPack.hbox ~packing () in
@@ -36,14 +45,37 @@ let list_to_string l =
     (fun acc ((n,q),s) -> acc^"(("^n^", "^q^"), "^(s#text)^"); ") "" l in
     "["^a^"]"
   (* String.concat "" (List.map (String.make 1) l) *)
+let step packing () =
+  let curr = !current in
+  let curr_entry = List.nth !turing_machine curr in
+  let _ = (!curr_entry)#set_has_frame false in
+  let next = curr + 1 in
+  let next_entry = List.nth !turing_machine next in
+  let _ = (!next_entry)#set_has_frame true in
+  let _ = current := (!current + 1) in
+    () 
 let make_turing_machine packing (s:string) =
-  let turing_table = GPack.table ~rows: 1 ~columns: (String.length s) ~row_spacings:10
+  let turing_table = GPack.table ~rows: 1 ~columns: ((String.length s)+3) ~row_spacings:10
     ~col_spacings:10 ~packing () in 
-  for i = 0 to (String.length s) do
-    GEdit.entry ~width: 50 ~height: 50
-    ~text:(Char.escaped (String.get s i)) ~packing:(turing_table #attach ~left:(i+1) ~top:0 ~expand:`NONE) ()
+  let turnstile = ref (GEdit.entry ~width: 50 ~height: 50 ~has_frame: true
+    ~text:"T" ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in
+  let _ = turing_machine := turnstile::!turing_machine in
+  for i = 0 to ((String.length s)-1) do
+    turing_machine := ref(GEdit.entry ~width: 50 ~height: 50 ~has_frame: false
+    ~text:(Char.escaped (String.get s i)) ~packing:(turing_table #attach ~left:(i+2) ~top:0 ~expand:`NONE) ())::!turing_machine
   done;
+  let empty = ref (GEdit.entry ~width: 50 ~height: 50 ~has_frame: false
+    ~text:"empty" ~packing:(turing_table #attach ~left:((String.length s)+2) ~top:0 ~expand:`NONE) ()) in
+  (* let _ = (!empty)#set_has_frame true in *)
+
+(*   (GEdit.entry ~width: 50 ~height: 50 ~has_frame: true ~text:"changed"
+    ~packing: (!empty)?packing ())  *)
+  let _ = turing_machine := empty::!turing_machine in
+  let _ = turing_machine := List.rev !turing_machine in
+(*   let _ = empty := ((GEdit.entry ~width: 50 ~height: 50 ~has_frame: false
+    ~text:"emp" ~packing:(turing_table #attach ~left:((String.length s)+2) ~top:0 ~expand:`NONE) ())) in (*this works!!!!! :DDDD*) *)
   ()
+  
   (* let text_holder = GPack.hbox ~height: 50 ~width: 50 ~packing: 
     (turing_table #attach ~left:1 ~top: 0 ~expand: `BOTH) () in *)
   (* let a = !input_t1 in *)
@@ -139,8 +171,6 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
   c#insert_action_markup 1 "<span foreground='red' >action 1</span>" ;
   entry *)
  
-
-
 let main () =
   let window = GWindow.window ~height: 600 ~width: 500 
     ~title:"CS 2800 Buddy" () in
@@ -247,8 +277,8 @@ let main () =
  *)
   (*this will be the step button*)
   let button_step = GButton.button ~label: "step forward" ~packing: box_step#pack () in
-    button_step#connect#clicked (fun () -> prerr_endline "next button pressed");
-(*   (* Menu bar *)
+    button_step#connect#clicked (step ()); (* (fun () -> step ()  prerr_endline "next button pressed" );
+ *)(*   (* Menu bar *)
   let menubar = GMenu.menu_bar ~packing:vbox#pack () in
   let factory = new GMenu.factory menubar in
   let accel_group = factory#accel_group in
