@@ -24,7 +24,9 @@ open Ast
 
 %%
 
-reg_exp: r = regex EOF { r };
+reg_exp:
+  |r = regex EOF { r }
+  ;
 
 regex:
   | EMPTY { Empty }
