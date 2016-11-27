@@ -1,17 +1,17 @@
 ### Starting build.
 # Target: main.ml.depends, tags: { extension:ml, file:main.ml, ocaml, ocamldep, quiet }
-/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules main.ml > main.ml.depends
+/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules main.ml > main.ml.depends # cached
 # Target: ast.mli.depends, tags: { extension:mli, file:ast.mli, ocaml, ocamldep, quiet }
 /home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules ast.mli > ast.mli.depends # cached
 # Target: lexer.mll, tags: { extension:mll, file:lexer.mll, lexer, ocaml, ocamllex, quiet }
-/home/ubuntu/.opam/4.03.0/bin/ocamllex.opt -q lexer.mll # cached
+/home/ubuntu/.opam/4.03.0/bin/ocamllex.opt -q lexer.mll
 # Target: lexer.ml.depends, tags: { extension:ml, file:lexer.ml, ocaml, ocamldep, quiet }
-/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules lexer.ml > lexer.ml.depends # cached
+/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules lexer.ml > lexer.ml.depends
 # Target: parser.mly, tags: { extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet }
 /home/ubuntu/.opam/4.03.0/bin/ocamlyacc parser.mly
 + /home/ubuntu/.opam/4.03.0/bin/ocamlyacc parser.mly
-File "parser.mly", line 27: unterminated action
-reg_exp: r = regex EOF { r };
-           ^
+File "parser.mly", line 28: unterminated action
+  |r = regex EOF { r }
+     ^
 Command exited with code 1.
 # Compilation unsuccessful.
