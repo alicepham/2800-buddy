@@ -16,10 +16,12 @@ let input_char = ref 'T'
 let current = ref 0
 
 (* let (turing_machine: (key * value) list ref) = ref [] *)
+
+(* [turing_machine] is a global variable to hold all GUI the tape cells in the
+ * tape of a turing machine*)
 let (turing_machine: (GEdit.entry ref) list ref) = ref []
 
-(* let turing_machine = ref [] *)
-(*transition matrix to hold list of lists*)
+(*[transition matrix] is a global variable  to hold an association dictionary*)
 let (transition_matrix: ((string * string) * GEdit.entry) list ref) = ref []
 
 let setup packing (make_entry : (GObj.widget -> unit) -> GEdit.entry) =
@@ -29,6 +31,9 @@ let setup packing (make_entry : (GObj.widget -> unit) -> GEdit.entry) =
   button#connect#clicked (fun () -> prerr_endline entry#text) ;
     ()
 
+(* [string_to_list s] is a helper function that seperates a string into a string
+ * list of the individual characters in that string
+ *)
 let string_to_list (s: string) =
   let rec helper c len = 
     if c = len then []
@@ -36,7 +41,9 @@ let string_to_list (s: string) =
   in 
   helper 0 (String.length s)
   
-(*helper function for debugging purposes*)
+(* [list_to_string l] is a helper function for debugging purposes, called
+ * to print the contents of the transition matrix/dictionary
+ *)
 let list_to_string l =
  (*  List.fold_left 
   let first = List.nth l 0 in
@@ -45,6 +52,17 @@ let list_to_string l =
     (fun acc ((n,q),s) -> acc^"(("^n^", "^q^"), "^(s#text)^"); ") "" l in
     "["^a^"]"
   (* String.concat "" (List.map (String.make 1) l) *)
+
+(* [step packing ()] is a function that steps the turing machine. 
+ * It accesses global variable current, transition function and 
+ * turing machine. 
+ * It then does the following:
+ * 1) lookup in transition dictionary for triple given current state
+ *    and input: (next_state, new_char, direction)
+ * 2) updates the char in the current_tape_cell to new_char
+ * 3) update the current_state to the next_state
+ * 4) updates the current_tape_cell with the next_tape_cell using direction
+ *)
 let step packing () =
   let curr = !current in
   let curr_entry = List.nth !turing_machine curr in
@@ -55,17 +73,19 @@ let step packing () =
   let _ = current := (!current + 1) in
     () 
 let make_turing_machine packing (s:string) =
-  let turing_table = GPack.table ~rows: 1 ~columns: ((String.length s)+3) ~row_spacings:10
-    ~col_spacings:10 ~packing () in 
+  let turing_table = GPack.table ~rows: 1 ~columns: ((String.length s)+3) 
+  ~row_spacings:10 ~col_spacings:10 ~packing () in 
   let turnstile = ref (GEdit.entry ~width: 50 ~height: 50 ~has_frame: true
     ~text:"T" ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in
   let _ = turing_machine := turnstile::!turing_machine in
   for i = 0 to ((String.length s)-1) do
     turing_machine := ref(GEdit.entry ~width: 50 ~height: 50 ~has_frame: false
-    ~text:(Char.escaped (String.get s i)) ~packing:(turing_table #attach ~left:(i+2) ~top:0 ~expand:`NONE) ())::!turing_machine
+      ~text:(Char.escaped (String.get s i)) ~packing:(turing_table #attach 
+        ~left:(i+2) ~top:0 ~expand:`NONE) ())::!turing_machine
   done;
   let empty = ref (GEdit.entry ~width: 50 ~height: 50 ~has_frame: false
-    ~text:"empty" ~packing:(turing_table #attach ~left:((String.length s)+2) ~top:0 ~expand:`NONE) ()) in
+    ~text:"empty" ~packing:(turing_table #attach ~left:((String.length s)+2) 
+      ~top:0 ~expand:`NONE) ()) in
   (* let _ = (!empty)#set_has_frame true in *)
 
 (*   (GEdit.entry ~width: 50 ~height: 50 ~has_frame: true ~text:"changed"
@@ -73,7 +93,8 @@ let make_turing_machine packing (s:string) =
   let _ = turing_machine := empty::!turing_machine in
   let _ = turing_machine := List.rev !turing_machine in
 (*   let _ = empty := ((GEdit.entry ~width: 50 ~height: 50 ~has_frame: false
-    ~text:"emp" ~packing:(turing_table #attach ~left:((String.length s)+2) ~top:0 ~expand:`NONE) ())) in (*this works!!!!! :DDDD*) *)
+    ~text:"emp" ~packing:(turing_table #attach ~left:((String.length s)+2) 
+      ~top:0 ~expand:`NONE) ())) in (*this works!!!!! :DDDD*) *)
   ()
   
   (* let text_holder = GPack.hbox ~height: 50 ~width: 50 ~packing: 
@@ -111,12 +132,13 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
   let cols = int_of_string c in
   let frame = GBin.frame ~label:"Transition Function Matrix" ~packing () in
   let button_submit = GButton.button ~label: "submit matrix" ~packing () in
-    button_submit#connect#clicked (fun () -> prerr_endline (list_to_string !transition_matrix));
+    button_submit#connect#clicked 
+      (fun () -> prerr_endline (list_to_string !transition_matrix));
   let scrolled_window = GBin.scrolled_window ~border_width:10 
     ~hpolicy: `AUTOMATIC ~vpolicy:`AUTOMATIC ~height: 250 
-    ~packing: frame#add () in
-  let table = GPack.table ~rows:rows ~columns:cols ~row_spacings:5 ~col_spacings:5
-    ~packing:scrolled_window#add_with_viewport () in
+      ~packing: frame#add () in
+  let table = GPack.table ~rows:rows ~columns:cols ~row_spacings:5 
+    ~col_spacings:5 ~packing:scrolled_window#add_with_viewport () in
   table #focus#set_hadjustment (Some scrolled_window # hadjustment);
   table #focus#set_vadjustment (Some scrolled_window # vadjustment);
   let input_turnstile = GButton.toggle_button ~label:("turnstile")
@@ -152,9 +174,10 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
   for i = 1 to (cols) do
     (* let y = [] *)
     for j=1 to (rows) do
-      transition_matrix := (("q_"^(string_of_int (j-1)), "input "^(string_of_int i)),
-      (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ()))
-      ::(!transition_matrix)
+      transition_matrix := 
+        (("q_"^(string_of_int (j-1)), "input "^(string_of_int i)),
+        (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ()))
+          ::(!transition_matrix)
       (* GButton.toggle_button *)
         (* ~label:("button ("^ string_of_int i ^","^ string_of_int j ^")\n") *)
     done
