@@ -5,7 +5,9 @@ let locale = GtkMain.Main.init ()
 
 
 (*transition matrix to hold list of lists*)
-let transition_matrix = Array.make 0 "a"
+(* let transition_matrix = Array.make 0 "a" *)
+
+let transition_matrix = ref []
 
 let setup packing (make_entry : (GObj.widget -> unit) -> GEdit.entry) =
   let box = GPack.hbox ~packing () in
@@ -21,6 +23,16 @@ let string_to_list (s: string) =
     else (String.get s c)::(helper (c+1) len)
   in 
   helper 0 (String.length s)
+  
+(*helper function for debugging purposes*)
+let list_to_string l =
+ (*  List.fold_left 
+  let first = List.nth l 0 in
+    first#text *)
+  let a = List.fold_left (fun acc s -> acc^(s#text)^"; ") "" l in
+    "["^a^"]"
+  (* String.concat "" (List.map (String.make 1) l) *)
+
 
 (*[make_matrix packing rows cols] creates a transition matrix in the GUI*)
 let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
@@ -29,7 +41,7 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
   let cols = int_of_string c in
   let frame = GBin.frame ~label:"Transition Function Matrix" ~packing () in
   let button_submit = GButton.button ~label: "submit matrix" ~packing () in
-    button_submit#connect#clicked (fun () -> prerr_endline "matrix submit pressed");
+    button_submit#connect#clicked (fun () -> prerr_endline (list_to_string !transition_matrix));
   let scrolled_window = GBin.scrolled_window ~border_width:10 
     ~hpolicy: `AUTOMATIC ~vpolicy:`AUTOMATIC ~height: 250 
     ~packing: frame#add () in
@@ -70,7 +82,7 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
   for i = 1 to (cols) do
     (* let y = [] *)
     for j=1 to (rows) do
-      (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ())
+      transition_matrix := (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ())::(!transition_matrix)
 
       (* GButton.toggle_button *)
         (* ~label:("button ("^ string_of_int i ^","^ string_of_int j ^")\n") *)
@@ -165,8 +177,9 @@ let main () =
 
   (* let _ = input_t1 := (GEdit.entry ~width: 50 ~height: 50) in *)
     (* ~text:"M" ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in *)
-  let input_t1 = ref (GEdit.entry ~width: 50 ~height: 50
-    ~text:"T" ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in
+  let input_t1 = ref (GEdit.entry ~width: 50 ~height: 50 ~text:"T" 
+    ~editable: false 
+      ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in
   let input_t2 = GEdit.entry ~width: 50 ~height: 50
     ~text:"a" ~packing:(turing_table #attach ~left:2 ~top:0 ~expand:`NONE) () in
   let input_t3 = GEdit.entry ~width: 50 ~height: 50
@@ -183,7 +196,8 @@ let main () =
     ~text:"U" ~packing:(turing_table #attach ~left:8 ~top:0 ~expand:`NONE) () in
 (*   let box_entry_str = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10 
     ~homogeneous: true ~packing: input_str_frame#add  () in *)
-  let box_step = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10  ~packing: box_turing#pack () in
+  let box_step = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10  
+    ~packing: box_turing#pack () in
 
 (*     let button_entry_num_states = GButton.button ~label:"input number of states" 
     ~packing:box_entry_num_states#add () in button_entry_num_states#connect#clicked     
