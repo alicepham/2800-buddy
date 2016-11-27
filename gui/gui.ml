@@ -3,19 +3,22 @@ open GdkKeysyms
 
 let locale = GtkMain.Main.init ()
 
+type state = Q of int 
 
+(*initializing states*)
+let current_state = ref (Q 0)
+let next_state = ref (Q 0)
+
+(* let turing_machine = ref [] *)
 (*transition matrix to hold list of lists*)
-(* let transition_matrix = Array.make 0 "a" *)
-
 let transition_matrix = ref []
 
 let setup packing (make_entry : (GObj.widget -> unit) -> GEdit.entry) =
   let box = GPack.hbox ~packing () in
   let entry = make_entry box#pack in
   let button = GButton.button ~stock:`JUMP_TO ~packing:box#pack () in
-  button#connect#clicked
-    (fun () -> prerr_endline entry#text) ;
-  ()
+  button#connect#clicked (fun () -> prerr_endline entry#text) ;
+    ()
 
 let string_to_list (s: string) =
   let rec helper c len = 
@@ -29,10 +32,45 @@ let list_to_string l =
  (*  List.fold_left 
   let first = List.nth l 0 in
     first#text *)
-  let a = List.fold_left (fun acc s -> acc^(s#text)^"; ") "" l in
+  let a = List.fold_left 
+    (fun acc ((n,q),s) -> acc^"(("^n^", "^q^"), "^(s#text)^"); ") "" l in
     "["^a^"]"
   (* String.concat "" (List.map (String.make 1) l) *)
+let make_turing_machine packing (s:string) =
+  let turing_table = GPack.table ~rows: 1 ~columns: (String.length s) ~row_spacings:10
+    ~col_spacings:10 ~packing () in 
+  for i = 0 to (String.length s) do
+    GEdit.entry ~width: 50 ~height: 50
+    ~text:(Char.escaped (String.get s i)) ~packing:(turing_table #attach ~left:(i+1) ~top:0 ~expand:`NONE) ()
+  done;
+  ()
+  (* let text_holder = GPack.hbox ~height: 50 ~width: 50 ~packing: 
+    (turing_table #attach ~left:1 ~top: 0 ~expand: `BOTH) () in *)
+  (* let a = !input_t1 in *)
 
+  (* let _ = input_t1 := (GEdit.entry ~width: 50 ~height: 50) in *)
+    (* ~text:"M" ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in *)
+(*   let input_t1 = ref (GEdit.entry ~width: 50 ~height: 50 ~text:"T" 
+    ~editable: false 
+      ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in
+  let input_t2 = GEdit.entry ~width: 50 ~height: 50
+    ~text:"a" ~packing:(turing_table #attach ~left:2 ~top:0 ~expand:`NONE) () in
+  let input_t3 = GEdit.entry ~width: 50 ~height: 50
+    ~text:"b" ~packing:(turing_table #attach ~left:3 ~top:0 ~expand:`NONE) () in
+  let input_t4 = GEdit.entry ~width: 50 ~height: 50
+    ~text:"a" ~packing:(turing_table #attach ~left:4 ~top:0 ~expand:`NONE) () in
+  let input_t5 = GEdit.entry ~width: 50 ~height: 50
+    ~text:"a" ~packing:(turing_table #attach ~left:5 ~top:0 ~expand:`NONE) () in
+  let input_t6 = GEdit.entry ~width: 50 ~height: 50
+    ~text:"a" ~packing:(turing_table #attach ~left:6 ~top:0 ~expand:`NONE) () in
+  let input_t7 = GEdit.entry ~width: 50 ~height: 50
+    ~text:"U" ~packing:(turing_table #attach ~left:7 ~top:0 ~expand:`NONE) () in
+  let input_t8 = GEdit.entry ~width: 50 ~height: 50
+    ~text:"U" ~packing:(turing_table #attach ~left:8 ~top:0 ~expand:`NONE) () in
+(*   let box_entry_str = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10 
+    ~homogeneous: true ~packing: input_str_frame#add  () in *)
+  let box_step = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10  
+    ~packing: box_turing#pack () in *)
 
 (*[make_matrix packing rows cols] creates a transition matrix in the GUI*)
 let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
@@ -82,8 +120,9 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
   for i = 1 to (cols) do
     (* let y = [] *)
     for j=1 to (rows) do
-      transition_matrix := (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ())::(!transition_matrix)
-
+      transition_matrix := (("q_"^(string_of_int (j-1)), "input "^(string_of_int i)),
+      (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ()))
+      ::(!transition_matrix)
       (* GButton.toggle_button *)
         (* ~label:("button ("^ string_of_int i ^","^ string_of_int j ^")\n") *)
     done
@@ -136,9 +175,9 @@ let main () =
   let entry_num_states = GEdit.entry ~packing:box_entry_num_states#add () in
 
   (*buttons*)
-  let button_entry_str = GButton.button ~label:"input string" 
+(*   let button_entry_str = GButton.button ~label:"input string" 
     ~packing:box_entry_str#add () in button_entry_str#connect#clicked     
-    (fun () -> prerr_endline entry_string#text);
+    (fun () -> prerr_endline entry_string#text); *)
   let button_entry_trans = GButton.button ~label:"input transition function" 
     ~packing:box_entry_trans#add () in button_entry_trans#connect#clicked     
     (fun () -> prerr_endline entry_transition#text) ;
@@ -169,15 +208,18 @@ let main () =
     ~packing:box_turing#pack () in
 (*   let table = GPack.table ~rows:20 ~columns:20 ~row_spacings:10
       ~col_spacings:10 ~packing:scrolled_window#add_with_viewport () in *)
-  let turing_table = GPack.table ~rows: 1 ~columns: 5 ~row_spacings:10
-    ~col_spacings:10 ~packing:turing_frame#add () in
+  let button_entry_str = GButton.button ~label:"input string" 
+    ~packing:box_entry_str#add () in button_entry_str#connect#clicked     
+    (fun () -> make_turing_machine turing_frame#add entry_string#text);
+(*   let turing_table = GPack.table ~rows: 1 ~columns: 5 ~row_spacings:10
+    ~col_spacings:10 ~packing:turing_frame#add () in *)
   (* let text_holder = GPack.hbox ~height: 50 ~width: 50 ~packing: 
     (turing_table #attach ~left:1 ~top: 0 ~expand: `BOTH) () in *)
   (* let a = !input_t1 in *)
 
   (* let _ = input_t1 := (GEdit.entry ~width: 50 ~height: 50) in *)
     (* ~text:"M" ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in *)
-  let input_t1 = ref (GEdit.entry ~width: 50 ~height: 50 ~text:"T" 
+(*   let input_t1 = ref (GEdit.entry ~width: 50 ~height: 50 ~text:"T" 
     ~editable: false 
       ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in
   let input_t2 = GEdit.entry ~width: 50 ~height: 50
@@ -193,7 +235,7 @@ let main () =
   let input_t7 = GEdit.entry ~width: 50 ~height: 50
     ~text:"U" ~packing:(turing_table #attach ~left:7 ~top:0 ~expand:`NONE) () in
   let input_t8 = GEdit.entry ~width: 50 ~height: 50
-    ~text:"U" ~packing:(turing_table #attach ~left:8 ~top:0 ~expand:`NONE) () in
+    ~text:"U" ~packing:(turing_table #attach ~left:8 ~top:0 ~expand:`NONE) () in *)
 (*   let box_entry_str = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10 
     ~homogeneous: true ~packing: input_str_frame#add  () in *)
   let box_step = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10  
