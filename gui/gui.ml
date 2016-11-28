@@ -3,7 +3,7 @@ open GdkKeysyms
 
 let locale = GtkMain.Main.init ()
 
-type state = Q of int 
+(* type state = Q of int  *)
 
 type key = state * char
 
@@ -11,7 +11,6 @@ type key = state * char
 type value = {state: string; input: string; dir: string}
 
 (*initializing states*)
-(* let current_state = ref (Q 0, 'T') *)
 let current_state = ref "q_0"
 let current_input = ref "T"
 
@@ -133,14 +132,17 @@ let make_turing_machine packing (s:string) =
   ~row_spacings:10 ~col_spacings:10 ~packing () in 
   let turnstile = 
     ref (GEdit.entry ~width: 50 ~height: 50 ~has_frame: true ~text:"T" 
+      ~editable: false
       ~packing:(turing_table #attach ~left:1 ~top:0 ~expand:`NONE) ()) in
   let _ = turing_machine := turnstile::!turing_machine in
   for i = 0 to ((String.length s)-1) do
     turing_machine := ref(GEdit.entry ~width: 50 ~height: 50 ~has_frame: false
+      ~editable: false
       ~text:(Char.escaped (String.get s i)) ~packing:(turing_table #attach 
         ~left:(i+2) ~top:0 ~expand:`NONE) ())::!turing_machine
   done;
   let empty = ref (GEdit.entry ~width: 50 ~height: 50 ~has_frame: false
+    ~editable: false
     ~text:"u" ~packing:(turing_table #attach ~left:((String.length s)+2) 
       ~top:0 ~expand:`NONE) ()) in
   let _ = turing_machine := empty::!turing_machine in
@@ -184,18 +186,21 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
       if i=1 then 
         transition_matrix := 
         (("q_"^(string_of_int (j-1)), "T"),
-        (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ()))
+        (GEdit.entry ~packing:(table #attach ~left:i ~top:j 
+        ~expand:`BOTH) ()))
           ::(!transition_matrix)
       else
       if i=(cols+2) then
         transition_matrix := 
         (("q_"^(string_of_int (j-1)), "u"),
-        (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ()))
+        (GEdit.entry ~packing:(table #attach ~left:i ~top:j 
+        ~expand:`BOTH) ()))
           ::(!transition_matrix)        
       else
       transition_matrix := 
         (("q_"^(string_of_int (j-1)), (String.make 1 (Char.chr(i+95)))),
-        (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ()))
+        (GEdit.entry ~packing:(table #attach ~left:i ~top:j 
+        ~expand:`BOTH) ()))
           ::(!transition_matrix)
     done
   done;
