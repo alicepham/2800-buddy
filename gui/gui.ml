@@ -7,13 +7,20 @@ type state = Q of int
 
 type key = state * char
 
-type value = state * char * char
+(* type value = state * char * char *)
+type value = {state: string; input: string; dir: string}
 
 (*initializing states*)
-let current_state = ref (Q 0, 'T')
-let next_state = ref (Q 0, 'T')
-let input_char = ref 'T'
-let current = ref 0
+(* let current_state = ref (Q 0, 'T') *)
+let current_state = ref "q_0"
+let current_input = ref "input_1"
+
+(* let next_state = ref (Q 0, 'T') *)
+(* let input_char = ref 'T' *)
+
+(* [current] is a global variable that keeps track of the 
+ * index of where you are in the tape*)
+let current_index = ref 0
 
 (* let (turing_machine: (key * value) list ref) = ref [] *)
 
@@ -23,6 +30,7 @@ let (turing_machine: (GEdit.entry ref) list ref) = ref []
 
 (*[transition matrix] is a global variable  to hold an association dictionary*)
 let (transition_matrix: ((string * string) * GEdit.entry) list ref) = ref []
+let (parsed_transition_matrix: ((string * string) * value) list ref) = ref []
 
 let setup packing (make_entry : (GObj.widget -> unit) -> GEdit.entry) =
   let box = GPack.hbox ~packing () in
@@ -32,7 +40,7 @@ let setup packing (make_entry : (GObj.widget -> unit) -> GEdit.entry) =
     ()
 
 (* [string_to_list s] is a helper function that seperates a string into a string
- * list of the individual characters in that string
+ * list of the individual characters in that string.
  *)
 let string_to_list (s: string) =
   let rec helper c len = 
@@ -53,6 +61,20 @@ let list_to_string l =
     "["^a^"]"
   (* String.concat "" (List.map (String.make 1) l) *)
 
+(* [parse s] is a simple function that takes in a value of form
+ * "(q_0, a, R)" and returns a triple of form ("q_0","a","R").
+ * It is used to parse through the text entry inputs
+ *)
+let parse (s:string) : value =
+  let char_list = string_to_list s in 
+  let n_char_list = List.map (fun x -> String.make 1 x) char_list in
+  match n_char_list with
+  | [p_1; q; u; o; c_1; i; c_2; dir1; p2] -> 
+      let state1 = q^u^o in
+        {state=state1; input=i; dir = dir1}
+      (* (state, i, dir) *)
+  | _ -> raise (Failure "invalid entry in transition matrix")
+
 (* [step packing ()] is a function that steps the turing machine. 
  * It accesses global variable current, transition function and 
  * turing machine. 
@@ -64,13 +86,40 @@ let list_to_string l =
  * 4) updates the current_tape_cell with the next_tape_cell using direction
  *)
 let step packing () =
-  let curr = !current in
+  (* raise (Failure "Unimplemnted") *)
+  let trans_dictionary = 
+    List.map (fun ((q,i),a) -> ((q,i),(parse a#text))) !transition_matrix in
+(*   let _ = 
+  parsed_transition_matrix :=
+    List.map (fun ((q,i),a) -> ((q,i),(parse a#text))) !transition_matrix in *)
+(*   let _ = prerr_endline (list_to_string !transition_matrix) in
+  let _ = prerr_endline (string_of_int (List.length !transition_matrix)) in 
+  let _ = prerr_endline (fst(fst (List.nth !transition_matrix 1))) in  *)
+  let get_value = 
+    List.assoc (!current_state, !current_input) trans_dictionary in
+    (* List.assoc ("q_0","input_1") !transition_matrix in  *)
+    (* List.nth !transition_matrix 1 in (*well that works..*) *)
+
+  let new_state = get_value.state in
+  let new_char = get_value.input in
+  let dir = get_value.dir in
+  let curr = !current_index in
   let curr_entry = List.nth !turing_machine curr in
   let _ = (!curr_entry)#set_has_frame false in
-  let next = curr + 1 in
-  let next_entry = List.nth !turing_machine next in
+  let _ = (!curr_entry)#set_text new_char in
+  let next_index = 
+    (match dir with
+    | "R" -> curr + 1 
+    | "L" -> curr - 1 
+    | _ -> raise (Failure "step - not a valid direction")) in
+  (* let next = curr + 1 in *)
+  let next_entry = List.nth !turing_machine next_index in
   let _ = (!next_entry)#set_has_frame true in
-  let _ = current := (!current + 1) in
+  let _ = current_index := next_index in
+  (* let _ = current_state := new_state in *)
+  (* let _ = current_input := (!next_entry)#text in *)
+  let _ = prerr_endline ("current_state: "^(!current_state)) in
+  let _ = prerr_endline ("current_input: "^(!current_input)) in
     () 
 
 (* [make_turing_machine packing s] does three things:
@@ -120,18 +169,18 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
   let input_turnstile = GButton.toggle_button ~label:("turnstile")
     ~packing:(table #attach ~left: 1 ~top: 0 ~expand: `BOTH) () in
   for m = 2 to cols do
-    GButton.toggle_button ~label:("input "^(string_of_int (m-1)))
+    GButton.toggle_button ~label:("input_"^(string_of_int (m-1)))
     ~packing:(table #attach ~left: m ~top: 0 ~expand: `BOTH) ()
   done;
   for n = 1 to rows do
     GButton.toggle_button ~label:("q_"^(string_of_int (n-1)))
     ~packing:(table #attach ~left: 0 ~top: n ~expand: `BOTH) ()
-  done;
+  done;(* Char.chr(i + 65) *)
   for i = 1 to (cols) do
     (* let y = [] *)
     for j=1 to (rows) do
       transition_matrix := 
-        (("q_"^(string_of_int (j-1)), "input "^(string_of_int i)),
+        (("q_"^(string_of_int (j-1)), "input_"^(string_of_int i)),
         (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ()))
           ::(!transition_matrix)
     done
