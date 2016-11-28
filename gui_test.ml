@@ -127,9 +127,10 @@ let main () =
         ()
 
       done ;
+
    in
 
-  let gui = paint init in
+  let gui _ = let () = paint init in false in
 
    (* Button - Stepping Part *)
   let button = GButton.button ~label:"Next Step"
@@ -139,6 +140,7 @@ let main () =
 
 
 (* Display the windows and enter Gtk+ main loop *)
+  da#event#connect#expose ~callback: gui ;
   window#show ();
   Main.main ()
 
