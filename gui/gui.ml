@@ -13,7 +13,7 @@ type value = {state: string; input: string; dir: string}
 (*initializing states*)
 (* let current_state = ref (Q 0, 'T') *)
 let current_state = ref "q_0"
-let current_input = ref "input_1"
+let current_input = ref "T"
 
 (* let next_state = ref (Q 0, 'T') *)
 (* let input_char = ref 'T' *)
@@ -116,8 +116,8 @@ let step packing () =
   let next_entry = List.nth !turing_machine next_index in
   let _ = (!next_entry)#set_has_frame true in
   let _ = current_index := next_index in
-  (* let _ = current_state := new_state in *)
-  (* let _ = current_input := (!next_entry)#text in *)
+  let _ = current_state := new_state in
+  let _ = current_input := (!next_entry)#text in
   let _ = prerr_endline ("current_state: "^(!current_state)) in
   let _ = prerr_endline ("current_input: "^(!current_input)) in
     () 
@@ -141,7 +141,7 @@ let make_turing_machine packing (s:string) =
         ~left:(i+2) ~top:0 ~expand:`NONE) ())::!turing_machine
   done;
   let empty = ref (GEdit.entry ~width: 50 ~height: 50 ~has_frame: false
-    ~text:"empty" ~packing:(turing_table #attach ~left:((String.length s)+2) 
+    ~text:"u" ~packing:(turing_table #attach ~left:((String.length s)+2) 
       ~top:0 ~expand:`NONE) ()) in
   let _ = turing_machine := empty::!turing_machine in
   let _ = turing_machine := List.rev !turing_machine in
@@ -162,25 +162,39 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
   let scrolled_window = GBin.scrolled_window ~border_width:10 
     ~hpolicy: `AUTOMATIC ~vpolicy:`AUTOMATIC ~height: 250 
       ~packing: frame#add () in
-  let table = GPack.table ~rows:rows ~columns:cols ~row_spacings:5 
+  let table = GPack.table ~rows:rows ~columns:(cols+2) ~row_spacings:5 
     ~col_spacings:5 ~packing:scrolled_window#add_with_viewport () in
   table #focus#set_hadjustment (Some scrolled_window # hadjustment);
   table #focus#set_vadjustment (Some scrolled_window # vadjustment);
-  let input_turnstile = GButton.toggle_button ~label:("turnstile")
+  let input_turnstile = GButton.toggle_button ~label:("T")
     ~packing:(table #attach ~left: 1 ~top: 0 ~expand: `BOTH) () in
-  for m = 2 to cols do
-    GButton.toggle_button ~label:("input_"^(string_of_int (m-1)))
+  for m = 2 to (cols+1) do
+    GButton.toggle_button ~label:(String.make 1 (Char.chr(m+95)))
     ~packing:(table #attach ~left: m ~top: 0 ~expand: `BOTH) ()
   done;
   for n = 1 to rows do
     GButton.toggle_button ~label:("q_"^(string_of_int (n-1)))
     ~packing:(table #attach ~left: 0 ~top: n ~expand: `BOTH) ()
-  done;(* Char.chr(i + 65) *)
-  for i = 1 to (cols) do
+  done;(* Char.chr(i + 97) *)
+  let input_turnstile = GButton.toggle_button ~label:("u")
+    ~packing:(table #attach ~left: (cols+2) ~top: 0 ~expand: `BOTH) () in
+  for i = 1 to (cols+2) do
     (* let y = [] *)
     for j=1 to (rows) do
+      if i=1 then 
+        transition_matrix := 
+        (("q_"^(string_of_int (j-1)), "T"),
+        (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ()))
+          ::(!transition_matrix)
+      else
+      if i=(cols+2) then
+        transition_matrix := 
+        (("q_"^(string_of_int (j-1)), "u"),
+        (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ()))
+          ::(!transition_matrix)        
+      else
       transition_matrix := 
-        (("q_"^(string_of_int (j-1)), "input_"^(string_of_int i)),
+        (("q_"^(string_of_int (j-1)), (String.make 1 (Char.chr(i+95)))),
         (GEdit.entry ~packing:(table #attach ~left:i ~top:j ~expand:`BOTH) ()))
           ::(!transition_matrix)
     done
