@@ -9,14 +9,7 @@ open Ast
 %token OR
 %token LPAREN
 %token RPAREN
-%token CONCAT
 %token EOF
-
-%nonassoc CHAR EMPTY LPAREN
-%left OR
-%left STAR
-%left CONCAT
-
 
 %start main
 %type <Ast.regex> main
@@ -24,16 +17,23 @@ open Ast
 
 %%
 
-reg_exp:
-  |r = regex EOF { r }
+main:
+  |r = or_regex EOF { r }
   ;
 
-regex:
+or_regex:
+  | r = or_regex OR s = con_regex { Or (r, s) }
+  | r = con_regex { r }
+  ;
+
+con_regex:
+  | r = con_regex s = star_regex { Concat (r,s) }
+  | r = star_regex { r }
+  ;
+
+star_regex:
   | EMPTY { Empty }
   | c = CHAR { Char c }
-  | LPAREN r = regex RPAREN { r }
-  | r = regex OR s = regex { Or(r,s) }
-  | r = regex STAR { Star r }
-  | r = regex s = regex { Concat(r,s) } %prec CONCAT
+  | LPAREN r = or_regex RPAREN { r }
+  | r = star_regex STAR { Star r }
   ;
-
