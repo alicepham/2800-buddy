@@ -19,7 +19,7 @@ let locale = GtkMain.Main.init ()
 
 
 (* Create FSM in initial state
-let font_name = "-*-helvetica-medium-r-normal-*-120-*"
+let font_name = "-*-helvetica-*--120-*"
 
 let font =
   try
@@ -28,12 +28,12 @@ let font =
     Gpointer.Null -> failwith ("font " ^ font_name ^ ": not found")
 *)
 
-(* Draw Text on drawable object
-let draw_text drawable (x, y) text =
+(* Draw Text on drawable object *)
+let draw_text drawable (x, y) font text =
   let string_width = Gdk.Font.string_width font text in
   let string_height = Gdk.Font.string_height font text in
   drawable#string text ~font ~x:(x - string_width/2) ~y:(y+string_height)
-*)
+
 
 
 (* Filled, black-outlined rectangle. *)
@@ -58,11 +58,6 @@ let main () =
                               ~title:"Turing Machine Visualization" () in
 
 
-
-
-
-
-
   let vbox = GPack.vbox ~packing:window#add () in
   window#connect#destroy ~callback:Main.quit;
 
@@ -77,12 +72,12 @@ let main () =
 
 (* Create the drawing area. *)
   let da = GMisc.drawing_area ~packing:vbox#add () in
-  let drawable = lazy (new GDraw.drawable da#misc#window) in
+  let w = da#misc#realize () ; da#misc#window in
+  let drawable_i = new GDraw.drawable w in
 
-let drawable_i = Lazy.force drawable in
-
-  let (width_i, height_i) = drawable_i#size in
-  let (float_width_i, float_height_i) =
+  let paint machine_state =
+      let (width_i, height_i) = drawable_i#size in
+      let (float_width_i, float_height_i) =
       (float_of_int(width_i), float_of_int(height_i)) in
 
       (* Calculate Size of Rectangle *)
@@ -99,6 +94,8 @@ let drawable_i = Lazy.force drawable in
 
       for n = 0 to (state_num - 1) do
 
+
+        let () = Pervasives.print_string "Line 98" in
         (* Current State in Loop *)
         let l_state = List.nth init.all_states n in
         let l_string_state = match l_state with
@@ -130,6 +127,15 @@ let drawable_i = Lazy.force drawable in
         ()
 
       done ;
+   in
+
+  let gui = paint init in
+
+   (* Button - Stepping Part *)
+  let button = GButton.button ~label:"Next Step"
+                              ~packing:vbox#add () in
+  (* Step
+  button#connect#clicked ~callback: (fun () -> paint (step) ); *)
 
 
 (* Display the windows and enter Gtk+ main loop *)
