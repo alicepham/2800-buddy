@@ -82,20 +82,20 @@ let main () =
 
       (* Calculate Size of Rectangle *)
       let state_num = List.length init.all_states in
-      let tot_state_area = width_i*height_i/2 in
+      let tot_state_area = width_i*height_i/4 in
       let state_area = tot_state_area/state_num in
-      (* Problem: Need operator - Square-root of state_area *)
+      (* Square-root of state_area *)
       let state_length = state_area |> float_of_int |> sqrt |> int_of_float in
 
       (* Draw Rectangles on screen - x/y-coordinates + color *)
-      let a = int_of_float(0.1*.float_width_i) in
-      let b =  int_of_float(0.1*.float_height_i) in
+      let a = ref (int_of_float(0.1*.float_width_i)) in
+      let b = ref (int_of_float(0.1*.float_height_i)) in
 
 
       for n = 0 to (state_num - 1) do
 
 
-        let () = Pervasives.print_string "Line 98" in
+
         (* Current State in Loop *)
         let l_state = List.nth init.all_states n in
         let l_string_state = match l_state with
@@ -103,38 +103,46 @@ let main () =
 
         (* Draw Rectangle *)
         let () = if l_state = init.curr_state then
-        draw_rectangle drawable_i "Spring Green" (a, b) state_length
+
+        draw_rectangle drawable_i "Spring Green" (!a, !b) state_length
+
         else
-        draw_rectangle drawable_i "Medium Blue" (a, b) state_length in
+
+        draw_rectangle drawable_i "Medium Blue" (!a, !b) state_length in
 
         (* Draw Text
         draw_text drawable_i (a, b) l_string_state ;
         *)
 
-        let float_a = float_of_int(a) in
-        let float_b = float_of_int(b) in
+        let float_a = float_of_int(!a) in
+        let float_b = float_of_int(!b) in
+
 
         (* New X Y Coordinates *)
-        let (a,b) =
+        let (imut_a,imut_b) =
 
         if float_b >= 0.9*.float_width_i then
           (int_of_float(0.1*.float_width_i),
-            b + state_length + int_of_float(0.03*.float_height_i) )
+            !b + state_length + int_of_float(0.03*.float_height_i) )
 
         else
-          (a + state_length + int_of_float(0.03*.float_width_i), b)
+          (!a + state_length + int_of_float(0.03*.float_width_i), !b)
         in
+        a := imut_a ;
+        b := imut_b ;
+
+
         ()
 
       done ;
 
    in
 
-  let gui _ = let () = paint init in false in
+  let gui _ = let () = paint init in true in
 
-   (* Button - Stepping Part *)
+  (* Button - Stepping Part *)
   let button = GButton.button ~label:"Next Step"
-                              ~packing:vbox#add () in
+                              ~packing: vbox#add () in
   (* Step
   button#connect#clicked ~callback: (fun () -> paint (step) ); *)
 
