@@ -8,6 +8,10 @@ type state = Q of int
 
 type symbol = Blank | Sigma of int
 
+type direction = Left | Right
+
+type transition_function = (state * string) * (state *string * direction) list
+
 type machine = {all_states : state list ; prev_state : state ;
                curr_state: state; next_state : state ; alphabet : int list ;
                tape_symbol_read : symbol}
@@ -17,6 +21,7 @@ type machine = {all_states : state list ; prev_state : state ;
 
 let locale = GtkMain.Main.init ()
 
+type state_location = { state : state ; x_cent : int ; y_cent : int }
 
 (* Create FSM in initial state
 let font_name = "-*-helvetica-*--120-*"
@@ -67,6 +72,8 @@ let main () =
   let init = {all_states = [Q 0 ; Q 1] ; prev_state = Q 0;
                curr_state = Q 1; next_state = Q 1 ; alphabet = [0;1];
                tape_symbol_read = Sigma 0} in
+  let matrix = [((Q 1, "a"), (Q 0, "b", Left)) ;
+                ((Q 1, "b"), (Q 1, "b", Left))] in
   (* Create the containing vbox. *)
 
 
@@ -75,10 +82,11 @@ let main () =
   let w = da#misc#realize () ; da#misc#window in
   let drawable_i = new GDraw.drawable w in
 
-  let paint machine_state =
+  let paint machine_state matrix =
       let (width_i, height_i) = drawable_i#size in
       let (float_width_i, float_height_i) =
       (float_of_int(width_i), float_of_int(height_i)) in
+      let st_loc_lst = ref [] in
 
       (* Calculate Size of Rectangle *)
       let state_num = List.length init.all_states in
@@ -94,10 +102,13 @@ let main () =
 
       for n = 0 to (state_num - 1) do
 
-
-
         (* Current State in Loop *)
         let l_state = List.nth init.all_states n in
+
+        (* State Location List *)
+        st_loc_lst := { state = l_state ;
+                        x_cent = !a + state_length/2 ;
+                        y_cent = !b + state_length/2 } :: !st_loc_lst ;
         let l_string_state = match l_state with
                              | Q x -> "Q" ^ string_of_int(x) in
 
@@ -136,9 +147,46 @@ let main () =
 
       done ;
 
+      let matrix_num = List.length matrix in
+
+      for y = 0 to (matrix_num - 1) do
+       let () = Pervasives.print_string "yo" in
+
+       let ((st_state, in_lett),
+            (end_state, out_lett, dir)) = List.nth matrix y in
+
+       let st_state_loc = !st_loc_lst |> List.filter
+         (fun x -> x.state = st_state) |> List.hd in
+
+       let end_state_loc = !st_loc_lst |> List.filter
+         (fun x -> x.state = end_state) |> List.hd in
+
+       let str_sta_x = string_of_int st_state_loc.x_cent in
+       let str_sta_y = string_of_int st_state_loc.y_cent in
+       let () = Pervasives.print_string ("x : "^str_sta_x) in
+       let () = Pervasives.print_string ("y : "^str_sta_y) in
+
+       let () = if st_state = end_state
+        then
+        drawable_i#arc ~x: st_state_loc.x_cent ~y: st_state_loc.y_cent
+                       ~width: 10 ~height: 10 ()
+        else
+        drawable_i#line ~x: st_state_loc.x_cent ~y: st_state_loc.y_cent
+                       ~x: end_state_loc.x_cent ~y: end_state_loc.y_cent
+        in
+
+       drawable_i#polygon ~filled: true
+       [(end_state_loc.x_cent - 5, end_state_loc.y_cent + 3) ;
+        (end_state_loc.x_cent + 5, end_state_loc.y_cent + 3) ;
+        (end_state_loc.x_cent, end_state_loc.y_cent - 3)] ;
+
+       ()
+
+      done ;
+
    in
 
-  let gui _ = let () = paint init in true in
+  let gui _ = let () = paint init matrix in true in
 
   (* Button - Stepping Part *)
   let button = GButton.button ~label:"Next Step"
