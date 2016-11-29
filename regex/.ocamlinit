@@ -1,0 +1,8 @@
+#directory "_build";;
+#load "ast.cmo";;
+#load "lexer.cmo";;
+#load "parser.cmo";;
+#load "regex.cmo";;
+#load "main.cmo";;
+#use "regex.ml";;
+
