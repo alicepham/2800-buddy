@@ -12,6 +12,8 @@ In this project, we attempt to create an animated turing machine using OCAML. We
 
 ##How to run Turing machine visualization:
 
+![](https://j.gifs.com/WnpLJE.gif)
+
 To run Turing machine visualization, first install `gtk` and `lablGTK2`.
 
 On Mac, 
