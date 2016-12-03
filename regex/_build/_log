@@ -1,0 +1,42 @@
+### Starting build.
+# Target: main.ml.depends, tags: { extension:ml, file:main.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules main.ml > main.ml.depends # cached
+# Target: regex.mli.depends, tags: { extension:mli, file:regex.mli, ocaml, ocamldep, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules regex.mli > regex.mli.depends
+# Target: ast.mli.depends, tags: { extension:mli, file:ast.mli, ocaml, ocamldep, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules ast.mli > ast.mli.depends # cached
+# Target: ast.cmi, tags: { byte, compile, extension:mli, file:ast.mli, interf, ocaml, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamlc.opt -c -I /home/ubuntu/.opam/4.03.0/lib/oUnit -I /home/ubuntu/.opam/4.03.0/lib/ocaml -o ast.cmi ast.mli # cached
+# Target: regex.cmi, tags: { byte, compile, extension:mli, file:regex.mli, interf, ocaml, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamlc.opt -c -I /home/ubuntu/.opam/4.03.0/lib/oUnit -I /home/ubuntu/.opam/4.03.0/lib/ocaml -o regex.cmi regex.mli
+# Target: main.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:main.cmo, file:main.ml, implem, ocaml, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamlc.opt -c -I /home/ubuntu/.opam/4.03.0/lib/oUnit -I /home/ubuntu/.opam/4.03.0/lib/ocaml -o main.cmo main.ml
+# Target: regex.ml.depends, tags: { extension:ml, file:regex.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules regex.ml > regex.ml.depends
+# Target: lexer.mll, tags: { extension:mll, file:lexer.mll, lexer, ocaml, ocamllex, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamllex.opt -q lexer.mll # cached
+# Target: lexer.ml.depends, tags: { extension:ml, file:lexer.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules lexer.ml > lexer.ml.depends # cached
+# Target: parser.mly.depends, tags: { extension:mly, file:parser.mly, infer, menhir_ocamldep, ocaml, ocamldep, quiet, traverse, use_menhir }
+menhir --raw-depend --ocamldep '/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules' parser.mly > parser.mly.depends # cached
+# Target: parser.mly, tags: { byte, compile, extension:ml, extension:mly, file:parser.ml, file:parser.mly, infer, menhir, ocaml, parser, quiet, traverse, use_menhir }
+menhir --ocamlc '/home/ubuntu/.opam/4.03.0/bin/ocamlc.opt -I /home/ubuntu/.opam/4.03.0/lib/oUnit -I /home/ubuntu/.opam/4.03.0/lib/ocaml' --infer parser.mly # cached
+# Target: parser.mli.depends, tags: { extension:mli, file:parser.mli, ocaml, ocamldep, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules parser.mli > parser.mli.depends # cached
+# Target: parser.cmi, tags: { byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamlc.opt -c -I /home/ubuntu/.opam/4.03.0/lib/oUnit -I /home/ubuntu/.opam/4.03.0/lib/ocaml -o parser.cmi parser.mli # cached
+# Target: lexer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:lexer.cmo, file:lexer.ml, implem, ocaml, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamlc.opt -c -I /home/ubuntu/.opam/4.03.0/lib/oUnit -I /home/ubuntu/.opam/4.03.0/lib/ocaml -o lexer.cmo lexer.ml # cached
+# Target: regex.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:regex.cmo, file:regex.ml, implem, ocaml, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamlc.opt -c -I /home/ubuntu/.opam/4.03.0/lib/oUnit -I /home/ubuntu/.opam/4.03.0/lib/ocaml -o regex.cmo regex.ml
+# Target: ast.ml.depends, tags: { extension:ml, file:ast.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules ast.ml > ast.ml.depends # cached
+# Target: ast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamlc.opt -c -I /home/ubuntu/.opam/4.03.0/lib/oUnit -I /home/ubuntu/.opam/4.03.0/lib/ocaml -o ast.cmo ast.ml # cached
+# Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamldep.opt -modules parser.ml > parser.ml.depends # cached
+# Target: parser.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:parser.cmo, file:parser.ml, implem, ocaml, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamlc.opt -c -I /home/ubuntu/.opam/4.03.0/lib/oUnit -I /home/ubuntu/.opam/4.03.0/lib/ocaml -o parser.cmo parser.ml # cached
+# Target: main.byte, tags: { byte, dont_link_with, extension:byte, file:main.byte, link, ocaml, program, quiet, traverse, use_menhir }
+/home/ubuntu/.opam/4.03.0/bin/ocamlc.opt -I /home/ubuntu/.opam/4.03.0/lib/oUnit -I /home/ubuntu/.opam/4.03.0/lib/ocaml unix.cma oUnitAdvanced.cma oUnit.cma ast.cmo parser.cmo lexer.cmo regex.cmo main.cmo -o main.byte
+# Compilation successful.
