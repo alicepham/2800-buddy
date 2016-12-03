@@ -1,6 +1,6 @@
 (*-----------Evalutation-----------*)
 
-(*Key generation stuff*)
+(*Key generation*)
 
 let p = 41
 let q = 83
@@ -9,7 +9,9 @@ let phi = 3280
 let public_key = 17
 let private_key = 193
 
-(*Getting digits from a string*)
+(* [string_to_list s ] Transforms string [s] into a list of  characters in [s]
+ * Requires:
+ *  - s is a valid string type*)
 let string_to_list (s: string) =
   let rec helper c len =
     if c = len then []
@@ -17,29 +19,52 @@ let string_to_list (s: string) =
   in
   helper 0 (String.length s)
 
+(* [(^^) x y defines an infix operator that concatenates integer [x] and
+ * integer [y]. Example: 5 ^^ 3 = 53
+ * Requires:
+ *  - x is a valid integer
+ *  - y is a valid integer *)
 let (^^) x y =
   let x' = string_of_int x in
   let y' = string_of_int y in
-  int_of_string (x'^y')
+  int_of_string(x'^y')
 
+(* [exponentiate x y] raises [x] to power [y]
+ * Requires:
+ *  - x is a valid integer
+ *  - y is a valid integer >= 0*)
+let rec exponentiate x y =
+  match y with
+  | 0 -> 1
+  | 1 -> x
+  | n -> if (n mod 2 = 0) then exponentiate (x*x) (n/2)
+         else x * exponentiate (x*x) ((n-1)/2)
+
+(* [is_upper x] Determines whether the character is uppercase
+ * Requires:
+ *  - x is a valid character of the upper or lowercase English alphabet*)
 let is_upper x=
   (Char.code x > 64 && Char.code x < 91)
 
-let rec list_to_digits lst =
+(* [list_to_digits lst] Tranforms a list of characters into their respective
+ * ASCII values
+ * Requires:
+ *  - lst is a list of characters of the upper or lowercase English alphabet *)
+let rec list_to_digits lst : int =
   match lst with
     | [] -> 0
     | h::t -> if is_upper h
-              then let code = Char.code - 65 in
+              then let code = Char.code h - 65 in
                     code^^(list_to_digits t)
-              else let code = Char.code - 70 in
+              else let code = Char.code h - 70 in
                     code^^(list_to_digits t)
 
 let encrypt str =
-  let msg = int_of_string str in
+  let msg = (list_to_digits str)/10 in
   (exponentiate msg public_key) mod n
 
 let decrypt str =
-  let encrypted = encrypt str in
+  let encrypted = encrypt str i
   (exponentiate encrypted private_key) mod n
 
 
