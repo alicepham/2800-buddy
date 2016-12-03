@@ -4,6 +4,10 @@ open GdkKeysyms
 
 let locale = GtkMain.Main.init ()
 
+(* How to Run
+ * ocamlfind ocamlc -g -package lablgtk2 -linkpkg gui.ml -o gui
+ * ./gui*)
+
 (************************Turing Machine Helpers********************************)
 
 type value = {state: string; input: string; dir: string}
@@ -209,6 +213,19 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
 
 (******************************************************************************)
 
+(*******************************RSA Helpers************************************)
+let rec make_step_one_encrypt packing = 
+  let frame_step_one = GBin.frame ~label: "Step 1" ~height: 60
+    ~packing () in
+  let vbox_step_one = GPack.vbox ~packing: (frame_step_one#add) () in
+  let a = GEdit.entry ~packing: vbox_step_one#pack () in
+  let next_button = GButton.button ~label: "next step" 
+    ~packing: vbox_step_one#pack () in
+    next_button#connect#clicked
+    ~callback: (fun () -> make_step_one_encrypt packing); ()
+
+(******************************************************************************)
+
 let main () =
   let window = GWindow.window ~height: 600 ~width: 500 
     ~title:"CS 2800 Buddy" () in
@@ -227,9 +244,6 @@ let main () =
   (*page 2 - turing machine page*)
   let vbox_turing   = GPack.vbox ~spacing: 5 
     ~packing:(fun w -> ignore (notebook#append_page w)) () in
-  let vbox_rsa_page = GPack.vbox ~spacing: 5
-    ~packing:(fun w -> ignore (notebook#append_page w)) () in
-
   let turing_button_page = GButton.button ~label: "go to turing machine!" 
     ~packing:(hbox_turing_button#add) () in
       turing_button_page#connect#clicked 
@@ -240,18 +254,14 @@ let main () =
       ~callback: (fun () -> (notebook#goto_page 2));
 
   (*turing machine page - frames*)
-  let input_str_frame = GBin.frame   ~label:"Inputs"
+  let input_str_frame = GBin.frame ~label:"Inputs"
     ~packing:vbox_turing#pack () in
-(*   let input_trans_frame = GBin.frame ~label:"Transition Function"
-    ~packing:vbox_turing#pack () in *)
   let vbox_inputs = GPack.vbox ~height: 100 ~width: 100 ~spacing: 10 
-    ~homogeneous: true ~packing: input_str_frame#add    () in
+    ~homogeneous: true ~packing: input_str_frame#add () in
 
   (*turing machine page - hboxes to hold entries*)
   let box_entry_str        = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10 
     ~homogeneous: true ~packing: vbox_inputs#add    () in
-(*   let box_entry_trans      = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10 
-    ~homogeneous: true ~packing: input_trans_frame#add  () in *)
 (*   let box_entry_num_input  = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10 
     ~homogeneous: true ~packing: vbox_inputs#add        () in *)
   let box_entry_num_states = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10 
@@ -269,10 +279,6 @@ let main () =
 
   (*turing machine page - buttons*)
   (*TODO make the formatting of this better looking*)
-(*   let button_entry_trans = GButton.button 
-    ~label:"input transition function"      ~packing:box_entry_trans#add     () 
-    in button_entry_trans#connect#clicked     
-    (fun () -> prerr_endline entry_transition#text); *)
 (*   let button_entry_num_input = GButton.button 
     ~label:"input number of input alphabet" ~packing:box_entry_num_input#add () 
     in button_entry_num_input#connect#clicked     
@@ -297,7 +303,8 @@ let main () =
 
   let button_entry_str = GButton.button ~label:"input string" 
     ~packing:box_entry_str#add () in button_entry_str#connect#clicked     
-    (fun () -> make_turing_machine turing_scroll_window#add_with_viewport entry_string#text);
+    (fun () -> make_turing_machine 
+     turing_scroll_window#add_with_viewport entry_string#text);
   let box_step = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10  
     ~packing: box_turing#pack () in
 
@@ -322,7 +329,39 @@ let main () =
   (*page 3 - RSA page*)
   let vbox_rsa_page = GPack.vbox ~spacing: 5
     ~packing:(fun w -> ignore (notebook#append_page w)) () in
-  (* let rsa_entry =GEdit.entry ~packing: vbox_rsa_page ~expand: false () in *)
+
+  (*RSA page - input message*)
+  let frame_rsa_message = GBin.frame ~label: "Input RSA message" ~height: 60
+    ~packing: (vbox_rsa_page#pack ~expand: false) () in
+
+  (*RSA page - input p and q*)
+  let hbox_p_q = GPack.hbox ~height: 40
+    ~packing: (vbox_rsa_page#pack ~expand: false) () in
+  let entry_rsa_message = GEdit.entry ~height: 30 
+    ~packing: frame_rsa_message#add () in
+  let frame_p = GBin.frame ~label: "p" ~height: 40
+    ~packing: (hbox_p_q#pack ~expand: false) () in
+  let entry_p = GEdit.entry ~width: 30 ~packing: frame_p#add () in
+  let frame_q = GBin.frame ~label: "q" ~height: 40
+    ~packing: (hbox_p_q#pack ~expand: false) () in
+  let entry_q = GEdit.entry ~width: 30 ~packing: frame_q#add () in
+
+  let encrypt_button = GButton.button ~label: "encrypt message" 
+    ~packing: (hbox_p_q#pack ~expand: false ~fill: true) () in
+    encrypt_button#connect#clicked
+    ~callback: (fun () -> make_step_one_encrypt 
+      (vbox_rsa_page#pack ~expand: false));
+
+  (*GUI notes*)
+  (* -- You can access the text in an entry by doing say, 
+   *     entry_rsa_message#text
+   * -- Here is an example of having a button do something on the callback:
+   *      let button_entry_str = GButton.button ~label:"input string" 
+   *         ~packing:box_entry_str#add () in button_entry_str#connect#clicked     
+   *         (fun () -> make_turing_machine 
+   *         turing_scroll_window#add_with_viewport entry_string#text);
+   *)
+
   window#show ();
   Main.main ()
 
