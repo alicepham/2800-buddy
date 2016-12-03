@@ -138,14 +138,3 @@ let is_simpler str1 str2 =
 let is_equal str1 str2 =
   (is_simpler str1 str2) && (is_simpler str2 str1)
 
-type language = Some of regex | None
-
-(*Derivative of a regular language*)
-let rec nullable reg =
-  match reg with
-    | Empty -> Empty
-    | Char _ -> None
-    | Concat (a,b) -> (nullable a) && (nullable b)
-    |
-
-
