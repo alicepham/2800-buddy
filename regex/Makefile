@@ -3,3 +3,6 @@ make:
 
 clean:
 	ocamlbuild -use-ocamlfind -clean
+
+test:
+	ocamlbuild -use-menhir -pkgs oUnit test.byte && ./test.byte
