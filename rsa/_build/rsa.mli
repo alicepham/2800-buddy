@@ -3,3 +3,5 @@
 val encrypt: string -> string
 
 val decrypt: string -> string
+
+val keys: unit -> (string*string)
