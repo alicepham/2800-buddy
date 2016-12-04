@@ -75,6 +75,31 @@ let random_pick n =
   let len = List.length (primes n) in
   List.nth (primes n) (Random.int len)
 
+let miller_rabin n =
+  if n <= 10 then (n=2 || n=3 || n=5 || n=7) else
+    if (n mod 2=0 || n mod 3=0 || n mod 5=0 || n mod 7=0) then false else
+      let rec remove_twos m =
+        let h = m/2 in
+          if (h+h <m) then (0,m) else
+            let (s,d) = remove_twos h in (s+1,d)
+      in
+        let (s,d) = remove_twos (n-1) in
+          let is_witness_to_compositness a =
+          let x = fast_exponentiate a d n in
+            if x = 1 || x =(n-1) then false else
+              let rec loop x r =
+                if x = 1 || r = s then true else
+                  if x = (n-1) then false else
+                    loop((x*x) mod n) (r+1)
+              in loop ((x*x) mod n ) 1
+          in
+          if (is_witness_to_compositness 2) then false
+          else if (is_witness_to_compositness 3) then false
+          else if (is_witness_to_compositness 5 ) then false
+          else if (is_witness_to_compositness 7) then false
+          else true
+
+
 (* [extended_euclidean a b] Computes the extended euclidean division algorithm
  * for [a] and [b] of the form. This computes both the greatest common
  * divisor and the coefficients of Bezout's Identity. That identity is
