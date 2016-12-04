@@ -15,7 +15,8 @@ let tests = [
                           (parse "(a+b)(a+b)*" |> star_rule |> print));
 "star_rule2 test1" >:: (fun _ -> assert_equal "((ab))*"
                           (parse "(ab)*(ab)*" |> star_rule2 |> print));
-"star_rule3 test1" >:: (fun _ -> assert_equal "(bab)**")
+"star_rule3 test1" >:: (fun _ -> assert_equal "(((ba)b))*"
+                          (parse "(bab)**" |> star_rule3 |> print))
 
 ]
 

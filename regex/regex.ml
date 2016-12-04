@@ -143,9 +143,6 @@ let is_simpler str1 str2 =
   (cond_3 str1 str2) ||
   (cond_4 str1 str2))
 
-(*check if two regex's have the same complexity*)
-let is_equal str1 str2 =
-  (is_simpler str1 str2) && (is_simpler str2 str1)
 
 (*-----------Implementation of Kleene Algebra------*)
 
