@@ -13,6 +13,15 @@ let parse str =
   let ast = Parser.main Lexer.read lexbuf in
   ast
 
+(*[print reg] produces a string from a regex tree*)
+let rec print reg =
+  match reg with
+    | Empty -> "E"
+    | Char a -> Char.escaped a
+    | Concat(reg1, reg2) -> "("^(print reg1)^(print reg2)^")"
+    | Or (reg1, reg2) -> "("^(print reg1) ^ "+" ^ (print reg2)^")"
+    | Star reg -> "("^(print reg)^ ")*"
+
 
 (*-----Operations for closure complexities------*)
 (*[successor y] defines the successor of a closure complexity
@@ -134,7 +143,92 @@ let is_simpler str1 str2 =
   (cond_3 str1 str2) ||
   (cond_4 str1 str2))
 
-(*check if two regex's are equal*)
+(*check if two regex's have the same complexity*)
 let is_equal str1 str2 =
   (is_simpler str1 str2) && (is_simpler str2 str1)
 
+(*-----------Implementation of Kleene Algebra------*)
+
+(*[star_rule reg] applies the star rule of Kleene algebra:
+ *aa* = a*a *)
+let rec star_rule reg =
+  match reg with
+    | Empty -> Empty
+    | Char a -> Char a
+    | Concat(reg1, Star(reg2)) -> if reg1 = reg2
+                                  then let reg' = star_rule reg1 in
+                                  Concat(Star(reg'),reg')
+                                  else
+                                    Concat(star_rule reg1, Star(star_rule reg2))
+    | Concat(reg1,reg2) -> Concat(star_rule reg1, star_rule reg2)
+    | Or(reg1,reg2) -> Or(star_rule reg1, star_rule reg2)
+    | Star reg -> Star(star_rule reg)
+
+(*[star_rule2 reg] applies the idempotence of stars in Kleene Algebra:
+ * a*a* = a* *)
+
+let rec star_rule2 reg =
+  match reg with
+    | Empty -> Empty
+    | Char a -> Char a
+    | Concat(Star(reg1), Star(reg2)) -> if reg1 = reg2
+                                        then Star(star_rule2 reg1)
+                                        else Concat(Star(reg1),Star(reg2))
+    | Concat(reg1,reg2) -> Concat(star_rule2 reg1, star_rule2 reg2)
+    | Or(reg1,reg2) -> Or(star_rule2 reg1, star_rule2 reg2)
+    | Star reg -> Star(star_rule2 reg)
+
+(*[star_rule3 reg] implements the third rule of stars in Kleene Algebra:
+ * a** = a* *)
+
+let rec star_rule3 reg =
+  match reg with
+    | Empty -> Empty
+    | Char a -> Char a
+    | Star(Star(reg)) -> Star(star_rule3 reg)
+    | Concat(reg1,reg2) -> Concat(star_rule3 reg1, star_rule3 reg2)
+    | Or(reg1,reg2) -> Or(star_rule3 reg1, star_rule3 reg2)
+    | Star reg -> Star(star_rule3 reg)
+
+(*[denest reg] applies the denesting rule of Kleene Algebra:
+ * (a*b* )a* = (a+b)**)
+
+let rec denest reg =
+  match reg with
+    | Empty -> Empty
+    | Char a -> Char a
+    | Concat(Concat(Star(reg1),Star(reg2)),Star(reg3)) ->
+          if reg1 = reg3
+          then Star(Or(denest reg1, denest reg2))
+          else Concat(Concat(Star(denest reg1),
+                Star(denest reg2)),Star(denest reg3))
+    | Concat(reg1,reg2) -> Concat(denest reg1, denest reg2)
+    | Or(reg1, reg2) -> Or(denest reg1, denest reg2)
+    | Star reg -> Star(denest reg)
+
+(*[shift reg] applies the shifting rule of Kleene Algebra:
+ * a(ba)* = (ab)*a *)
+
+let rec shift reg =
+  match reg with
+    | Empty -> Empty
+    | Char a -> Char a
+    | Concat(reg1, Star(Concat(reg2,reg3))) ->
+        if reg1 = reg3
+        then Concat(Star(Concat(shift reg1, shift reg2)),(shift reg3))
+        else Concat((shift reg1), Star(Concat(shift reg2, shift reg3)))
+    | Concat(reg1,reg2) -> Concat(shift reg1, shift reg2)
+    | Or(reg1,reg2) -> Or(shift reg1, shift reg2)
+    | Star reg -> Star(shift reg)
+
+(*[star_rule4 reg] applies the following rule from Kleene Algebra
+ * a* = (aa)* + a(aa)* *)
+let rec star_rule4 reg =
+  match reg with
+    | Empty -> Empty
+    | Char a -> Char a
+    | Concat(reg1, reg2) -> Concat(star_rule4 reg1, star_rule4 reg2)
+    | Or(reg1, reg2) -> Or(star_rule4 reg1, star_rule4 reg2)
+    | Star reg -> let reg' = star_rule4 reg in
+                  Or(Star(Concat(reg',reg')),
+                      Concat(reg',Star(Concat(reg',reg'))))
