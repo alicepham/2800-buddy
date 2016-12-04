@@ -304,6 +304,46 @@ let main () =
        (* Draw arrow on top of square *)
        drawable_i#polygon ~filled:true arrow ;
 
+       (* Draw 0/1 above transition function line
+       let mid_x = (end_state_loc.x_cent - st_state_loc.x_cent) / 2 +
+       st_state_loc.x_cent in
+       let mid_y = (end_state_loc.y_cent - st_state_loc.y_cent) / 2 +
+       st_state_loc.y_cent in
+       let fl_mid_x = float_of_int mid_x in
+       let fl_mid_y = float_of_int mid_y in
+       let fl_state_length_25 = 0.025*.fl_state_length in
+       let int_state_length_25 = int_of_float fl_state_length_25 in
+       let fl_state_length_20 = 0.02*.fl_state_length in
+       let int_state_length_20 = int_of_float fl_state_length_20 in
+       let fl_state_length_200 = 0.2*.fl_state_length in
+       let int_state_length_200 = int_of_float fl_state_length_200 in
+
+       let () = match in_lett with
+                      | 0 ->  drawable_i#polygon ~filled: false
+                                 [(mid_x + int_state_length_200,
+                                   mid_y - int_state_length_20) ;
+                                  (mid_x - int_state_length_25,
+                                   mid_y - int_state_length_20) ;
+                                  (mid_x + int_state_length_25,
+                                   mid_y - int_state_length_200) ;
+                                  (mid_x + int_state_length_25,
+                                   mid_y - int_state_length_200)] ; ()
+                      | 1 -> (drawable_i#line ~x: mid_x+int_state_length_25
+                                             ~y: mid_y - int_state_length_20
+                                             ~x: mid_x - int_state_length_25
+                                             ~y: mid_y - int_state_length_20;
+                             drawable_i#line ~x: mid_x + int_state_length_25
+                                             ~y: mid_y - int_state_length_200
+                                             ~x: mid_x + int_state_length_25
+                                             ~y: mid_y - int_state_length_200 ;
+                             drawable_i#line ~x: mid_x
+                                             ~y: mid_y -int_state_length_20
+                                             ~x: mid_x
+                                             ~y: mid_y - int_state_length_20; ())
+
+
+       in *)
+
        ()
 
       done ;
