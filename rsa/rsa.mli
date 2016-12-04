@@ -1,7 +1,7 @@
 (*Defines the RSA interface, for encrytion of strings*)
 
-val encrypt: string -> string
+val encrypt: string -> int list
 
-val decrypt: string -> string
+val decrypt: int list -> int list
 
-val keys: unit -> (string*string)
+val decode: int list -> string
