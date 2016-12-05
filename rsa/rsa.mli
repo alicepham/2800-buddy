@@ -1,19 +1,35 @@
 (*Defines the RSA interface, for encryption of strings*)
 
-(*[encrypt str] encrypts a string using RSA
- *requires:
- *  -str:string *)
-val encrypt: string -> int list
+(*[step_1] generates the large primes [p] and [q]*)
+val step_1 : string -> string -> string
 
-(*[decrypt msg] returns a list of ints that correspond to a msg
- *requires:
- *  -msg is a large int representing the encoding of an English msg*)
-val decrypt: int list -> int list
+(*[step_2] defines and generates the modulus*)
+val step_2: string -> string -> string
 
-(* [translate lst] transforms a list of ints into the msg initially encrypted
- * Requires:
- *  - lst is a valid list of integers*)
-val decode: int list -> string
+(*[step_3] defines and computes the totient*)
+val step_3: string -> string -> string
+
+(*[step_4] explains how to generate the public key*)
+val step_4: string -> string
+
+(*[step_5] explains how to generate the private key*)
+val step_5: string -> string -> string -> string
+
+(*[step_6] prints the user's determined fields for public and private
+ *keys as well as the large primes*)
+val step_6: string -> string -> string -> string
+
+(*[step_7 msg] encrypts the user's message, and displays the resulting
+ *encryption*)
+val step_7: string -> string
+
+(*[step_8 lst] decrypts the message to a large int displayed on the
+ *screen. *)
+val step_8: int list -> string -> string -> string -> string
+
+(* [step_9 msg] Displays the decoded message than had been decrypted. This
+ * matches the message originally sent.*)
+val step_9: int list -> string
 
 (* [random_pick n] Returns a random prime number less than the limit [n]
  * Requires:
