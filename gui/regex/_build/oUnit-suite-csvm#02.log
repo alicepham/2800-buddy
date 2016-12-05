@@ -1,0 +1,15 @@
+2016-12-04T05:27:10+00:00 csvm#02 I: Start test suite:1:regex test 2.
+2016-12-04T05:27:10+00:00 csvm#02 I: Test suite:1:regex test 2 is successful.
+2016-12-04T05:27:10+00:00 csvm#02 I: End test suite:1:regex test 2.
+2016-12-04T05:27:10+00:00 csvm#02 I: Start test suite:2:regex test 3.
+2016-12-04T05:27:10+00:00 csvm#02 I: Test suite:2:regex test 3 is successful.
+2016-12-04T05:27:10+00:00 csvm#02 I: End test suite:2:regex test 3.
+2016-12-04T05:27:10+00:00 csvm#02 I: Start test suite:3:regex test 4.
+2016-12-04T05:27:10+00:00 csvm#02 I: Test suite:3:regex test 4 is successful.
+2016-12-04T05:27:10+00:00 csvm#02 I: End test suite:3:regex test 4.
+2016-12-04T05:27:10+00:00 csvm#02 I: Start test suite:5:star_rule1 test1.
+2016-12-04T05:27:10+00:00 csvm#02 I: Test suite:5:star_rule1 test1 is successful.
+2016-12-04T05:27:10+00:00 csvm#02 I: End test suite:5:star_rule1 test1.
+2016-12-04T05:27:10+00:00 csvm#02 I: Start test suite:6:star_rule2 test1.
+2016-12-04T05:27:10+00:00 csvm#02 I: Test suite:6:star_rule2 test1 is successful.
+2016-12-04T05:27:10+00:00 csvm#02 I: End test suite:6:star_rule2 test1.

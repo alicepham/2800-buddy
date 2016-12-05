@@ -1,0 +1,13 @@
+### Starting build.
+Backtrace:
+                      - Failed to build the target gui.native
+                          - Building gui.native:
+                              - Building gui.cmx:
+                                  - Failed to build all of these:
+                                      - Building gui.ml:
+                                          - Failed to build all of these:
+                                              - Building gui.mly
+                                              - Building gui.mlypack
+                                              - Building gui.mll
+                                      - Building gui.mlpack
+# Compilation unsuccessful.
