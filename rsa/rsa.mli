@@ -1,34 +1,65 @@
 (*Defines the RSA interface, for encryption of strings*)
 
-(*[step_1] generates the large primes [p] and [q]*)
+(* [step_1] generates the large primes [p] and [q]
+ * Requires:
+ *  - p is prime integer
+ *  - q is a prime integer*)
 val step_1 : string -> string -> string
 
-(*[step_2] defines and generates the modulus*)
+(* [step_2] defines and generates the modulus
+ * Requires:
+ *  - p is prime integer
+ *  - q is a prime integer *)
 val step_2: string -> string -> string
 
-(*[step_3] defines and computes the totient*)
+(* [step_3] defines and computes the totient
+ * Requires:
+ *  - p is prime integer
+ *  - q is a prime integer *)
 val step_3: string -> string -> string
 
-(*[step_4] explains how to generate the public key*)
+(* [step_4] explains how to generate the public key
+ * Requires:
+ *  - public_key is a prime integer used for exponentiation*)
 val step_4: string -> string
 
-(*[step_5] explains how to generate the private key*)
+(* [step_5] explains how to generate the private key
+ * Requires:
+ *  - p is a prime integer
+ *  - q is a prime integer
+ *  - public_key is a prime integer used for exponentiation*)
 val step_5: string -> string -> string -> string
 
-(*[step_6] prints the user's determined fields for public and private
- *keys as well as the large primes*)
+(* [step_6] prints the user's determined fields for public and private
+ * keys as well as the large primes
+ * Requires:
+ *  - p is a prime integer
+ *  - q is a prime integer
+ *  - public_key is a prime integer used for exponentiation *)
 val step_6: string -> string -> string -> string
 
-(*[step_7 msg] encrypts the user's message, and displays the resulting
- *encryption*)
-val step_7: string -> string
+(* [step_7 msg] encrypts the user's message, and displays the resulting
+ * encryption
+ * Requires:
+ *  - msg is a valid string of the user's input to encrypt
+ *  - public_key is a prime integer used for exponentiation
+ *  - n is the totient value to be moded by*)
+val step_7: string -> string -> string -> string
 
-(*[step_8 lst] decrypts the message to a large int displayed on the
- *screen. *)
-val step_8: int list -> string -> string -> string -> string
+(* [step_8 lst] decrypts the message to a large int displayed on the
+ * screen.
+ * Requires:
+ *  - lst is an int list, the result of the encrypted message
+ *  - p is a prime integer
+ *  - q is a prime integer
+ *  - public_key is a prime integer used for exponentiation
+ *  - n is the totient value to be moded by *)
+val step_8: int list -> string -> string -> string -> string -> string
 
 (* [step_9 msg] Displays the decoded message than had been decrypted. This
- * matches the message originally sent.*)
+ * matches the message originally sent.
+ * Requires:
+ *  - lst is the int list returned by the decryption *)
 val step_9: int list -> string
 
 (* [random_pick n] Returns a random prime number less than the limit [n]
