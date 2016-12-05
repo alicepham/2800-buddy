@@ -69,6 +69,16 @@ let rec num_syms reg_exp =
     | Or (reg1,reg2) -> (num_syms reg1) + (num_syms reg2)
 
 (*-------Determining the relation <_cc---------*)
+
+(*determine the size of a regex*)
+let rec size reg =
+  match reg with
+    | Empty -> 0
+    | Char _ -> 1
+    | Star reg -> 1
+    | Concat(reg1,reg2) -> (size reg1) + (size reg2)
+    | Or(reg1,reg2) -> 1 + (size reg1) + (size reg2)
+
 (*[chop lst n] *)
 let rec chop lst n =
   match lst with
@@ -108,22 +118,18 @@ let (@$$) cc1 cc2 =
   else equal_cc_hard cc1 cc2 (len2 -1)
 
 (*condition 3*)
-let cond_3 str1 str2 =
-  let size1 = String.length str1 in
-  let size2 = String.length str2 in
-  let reg1 = parse str1 in
-  let reg2 = parse str2 in
+let cond_3 reg1 reg2 =
+  let size1 =  size reg1 in
+  let size2 = size reg2 in
   let cc1 = cl_comp reg1 in
   let cc2 = cl_comp reg2 in
   ((cc1 = cc2) && (size1=size2) &&
     (num_concats reg1 < num_concats reg2))
 
 (*cond_4*)
-let cond_4 str1 str2 =
-  let size1 = String.length str1 in
-  let size2 = String.length str2 in
-  let reg1 = parse str1 in
-  let reg2 = parse str2 in
+let cond_4 reg1 reg2 =
+  let size1 =  size reg1 in
+  let size2 = size reg2 in
   let cc1 = cl_comp reg1 in
   let cc2 = cl_comp reg2 in
   ((cc1 = cc2) && (size1=size2) &&
@@ -131,17 +137,15 @@ let cond_4 str1 str2 =
     (num_syms reg1 < num_syms reg2))
 
 (*Check if a given regex is simpler than the second regex given*)
-let is_simpler str1 str2 =
-  let size1 = String.length str1 in
-  let size2 = String.length str2 in
-  let reg1 = parse str1 in
-  let reg2 = parse str2 in
+let is_simpler reg1 reg2 =
+  let size1 =  size reg1 in
+  let size2 = size reg2 in
   let cc1 = cl_comp reg1 in
   let cc2 = cl_comp reg2 in
   ((cc1 @$$ cc2) ||
   ((cc1 = cc2) && (size1 < size2)) ||
-  (cond_3 str1 str2) ||
-  (cond_4 str1 str2))
+  (cond_3 reg1 reg2) ||
+  (cond_4 reg1 reg2))
 
 
 (*-----------Implementation of Kleene Algebra------*)

@@ -11,7 +11,7 @@ type cc
 (*[is_simpler] checks if the first regex is simpler than the second.
  *return true if it is. Can be used to see if a regex is more simplifed
  *after an application of a Kleene Algebra rule*)
-val is_simpler: string -> string -> bool
+val is_simpler: regex -> regex -> bool
 
 (*------Printing and Parsing stuff------------------*)
 
