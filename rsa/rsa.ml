@@ -44,7 +44,24 @@ let fast_exponentiate a b m =
          helper (a_h*a_h mod m) (b_h/2) (p_h)
     in helper a1 b p
 
-(* [sieve n]*)
+(* [sieve n] Creates an array of size [n] where elements are initalized to bools
+ * according to the Sieve of Eratosthenes algorithm. To find all prime numbers
+ * less than a given integer [n]:
+ *   1) Create a list of consecutive integers from 2 through (n-1):(2,3,...,n-1)
+ *   2) Initially, let p = 2, the smallest prime number
+ *   3) Enumerate the multiples of p counting to n from 2p in increments of p
+ *      and mark them in the list (these will be 2p, 3p, 4p,...,; the p itself
+ *      should not be marked)
+ *   4) Find the first number greater than p in the list that is not marked. If
+ *      there was no such number, stop. Otherwise, let p now equal this new
+ *      number (which is the next prime), and repeat from step 3
+ *
+ * the boolean elements of the array created by [sieve n] correspond to false
+ * for non-prime values and true for prime values.
+ * Acknowledgement: Code is adapted from Rosetta code discussion of Sieve and
+ * Primes. Found here https://rosettacode.org/wiki/Sieve_of_Eratosthenes#OCaml
+ * Requires:
+ *  - n is an integer less than 10^6+ *)
 let sieve n =
   let is_prime = Array.make n true in
   let limit = truncate(sqrt (float_of_int(n -1))) in
@@ -60,7 +77,13 @@ let sieve n =
   is_prime.(1) <- false;
   is_prime
 
-  (*[primes n]*)
+(* [primes n] Populates an array of size [n] as determined by the Sieve of
+ * Eratosthenes. elements of the array set to true are updated with their
+ * respective prime numbers.
+ * Acknowledgement: Code is adapted from Rosetta code discussion of Sieve and
+ * Primes. Found here https://rosettacode.org/wiki/Sieve_of_Eratosthenes#OCaml
+ * Requires:
+ *  - n is an integer less than 10^6+ *)
 let primes n =
  let primes, _ =
   let sieve = sieve n in
@@ -70,11 +93,30 @@ let primes n =
     ([], Array.length sieve - 1) in
   primes
 
-(* [random_pick lst] *)
+(* [random_pick n] Returns a random prime number less than the limit [n]
+ * Requires:
+ *  - n is an integer less than 10^6+  *)
 let random_pick n =
   let len = List.length (primes n) in
   List.nth (primes n) (Random.int len)
 
+(* [miller_rabin n] Employs the Miller-Rabin primality test to integer [n]
+ * Approach relies on the "converse of Fermat's Theorem we know that:
+ *         n-1      1
+          a     ~  n   for any prime n and any a in [2,n-1]. If this fails on
+ * an [n] then we know that [n] is not prime. so we write
+                    s
+ *        n-1 as d*2  , where d is odd. If n is prime, then the sequence hits 1
+ * and stays there from then on. If [n] is prime then n-1 must hold the
+ * position in the sequence right before the first 1." [miller-rabin n] returns
+ * false if the sequence does not end in 1 indicating that [n] is composite
+ * and true if [n] is probably prime. This approach does not use random witness
+ * so as a result is only accurate up to 2 billion. Instead factors 2,3,5, and 7
+ * are hard checked.
+ * Acknowledgement: This code is adapted from Carnegie Mellon's 15-251 course
+ * "Great Theoretical Ideas in Computer Science" Lecture 14, Fall 2010.
+ * Requires:
+ *   - n is an integer less than 2*10^5+ *)
 let miller_rabin n =
   if n <= 10 then (n=2 || n=3 || n=5 || n=7) else
     if (n mod 2=0 || n mod 3=0 || n mod 5=0 || n mod 7=0) then false else
@@ -98,7 +140,6 @@ let miller_rabin n =
           else if (is_witness_to_compositness 5 ) then false
           else if (is_witness_to_compositness 7) then false
           else true
-
 
 (* [extended_euclidean a b] Computes the extended euclidean division algorithm
  * for [a] and [b] of the form. This computes both the greatest common
