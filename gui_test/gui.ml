@@ -3,6 +3,7 @@ open GMain
 open GdkKeysyms
 open Regex
 open Rsa
+open GObj
 (* open Machine *)
 
 let locale = GtkMain.Main.init ()
@@ -33,6 +34,41 @@ ocamlc -c regex.mli
 
 (* ocamlbuild -use-ocamlfind -use-menhir -pkgs lablgtk2.auto-init gui.native *)
 (* ./gui.byte*)
+
+type state = Q of int
+
+type symbol = Blank | Sigma of int
+
+type direction = Left | Right
+
+type transition_function = (state * string) * (state *string * direction) list
+
+type machine = {all_states : state list ; prev_state : state ;
+               curr_state: state; next_state : state ; alphabet : int list ;
+               tape_symbol_read : symbol}
+
+(* state location type:
+ 'state' field identifies the state,
+ 'x_cent' field identifies the location of the x-coordinate of the center of the
+square on the drawable object.
+ 'y_cent' field identifies the location of the y-coordinates of the center of the
+square on the drawable object. *)
+type state_location = { state : state ; x_cent : int ; y_cent : int }
+
+
+(* Filled, black-outlined rectangle. *)
+let draw_rectangle (drawable : GDraw.drawable)
+    fill_col (x, y) squ_length =
+
+  drawable#set_foreground (`NAME fill_col);
+  drawable#rectangle ~x:x ~y:y ~width: squ_length
+  ~height: squ_length ~filled:true ();
+
+  drawable#set_foreground `BLACK;
+  drawable#rectangle ~x:x ~y:y ~width: squ_length
+  ~height: squ_length ~filled:false ()
+
+
 (************************Turing Machine Helpers********************************)
 
 (*[entry] is an entry in the transition matrix function*)
@@ -507,10 +543,10 @@ let main () =
     ~packing: frame_rsa_message#add () in
   let frame_p = GBin.frame ~label: "p" ~height: 40
     ~packing: (hbox_p_q#pack ~expand: false) () in
-  let entry_p = GEdit.entry ~width: 30 ~packing: frame_p#add () in
+  let entry_p = GEdit.entry ~width: 100 ~packing: frame_p#add () in
   let frame_q = GBin.frame ~label: "q" ~height: 40
     ~packing: (hbox_p_q#pack ~expand: false) () in
-  let entry_q = GEdit.entry ~width: 30 ~packing: frame_q#add () in
+  let entry_q = GEdit.entry ~width: 100 ~packing: frame_q#add () in
 
   let frame_public_key = GBin.frame ~label: "public key" ~height: 40
     ~packing: (hbox_p_q#pack ~expand: false) () in
@@ -519,7 +555,19 @@ let main () =
   let encrypt_button = GButton.button ~label: "next"
     ~packing: (hbox_p_q#pack ~expand: false ~fill: false) () in
     encrypt_button#connect#clicked
-    ~callback: (fun () -> (step_encrypt
+    ~callback: (fun () -> if entry_p#text = ""
+                          then entry_p#set_text (string_of_int(random_pick 500))
+                          else (let p = int_of_string entry_p#text in 
+                                (if miller_rabin p then entry_p#set_text (entry_p#text)
+                                    else entry_p#set_text "Not a prime"));  
+                          
+                          if entry_q#text = ""
+                          then entry_q#set_text (string_of_int(random_pick 500))
+                          else (let q = int_of_string entry_q#text in 
+                                (if miller_rabin q then entry_q#set_text (entry_q#text)
+                                    else entry_q#set_text "Not a prime"));
+
+      (step_encrypt
       (vbox_rsa_page#pack ~expand: false) 
       !rsa_counter entry_p#text entry_q#text entry_rsa_message#text entry_public_key#text));
 
