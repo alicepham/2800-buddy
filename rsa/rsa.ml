@@ -1,14 +1,6 @@
 open Random
 (*-----------Evalutation-----------*)
 
-(*Key generation*)
-let p = "41"
-let q = "83"
-let n = "3403"
-let phi = "3280"
-let public_key = "17"
-let private_key = "193"
-
 (* [string_to_list s ] Transforms string [s] into a list of  characters in [s]
  * Requires:
  *  - s is a valid string type*)
