@@ -234,7 +234,7 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
     ~col_spacings:5 ~packing:scrolled_window#add_with_viewport () in
     table #focus#set_hadjustment (Some scrolled_window # hadjustment);
     table #focus#set_vadjustment (Some scrolled_window # vadjustment);
-  let input_turnstile = GButton.toggle_button ~label:("T")
+  let input_turnstile = GButton.toggle_button ~label:("[")
     ~packing:(table #attach ~left: 1 ~top: 0 ~expand: `BOTH) () in
   for m = 2 to (cols+1) do
     GButton.toggle_button ~label:(String.make 1 (Char.chr(m+95)))
@@ -246,7 +246,7 @@ let make_matrix packing (r: string) (c: string) (input_alphabet: string list) =
     GButton.toggle_button ~label:("q_"^(string_of_int (n-1)))
     ~packing:(table #attach ~left: 0 ~top: n ~expand: `BOTH) ()
   done;(* Char.chr(i + 97) *)
-  let input_turnstile = GButton.toggle_button ~label:("u")
+  let input_turnstile = GButton.toggle_button ~label:("_")
     ~packing:(table #attach ~left: (cols+2) ~top: 0 ~expand: `BOTH) () in
 
   (*adding GEdit.entries objects to the global transition_matrix to be
@@ -462,13 +462,13 @@ let main () =
     ~homogeneous: true ~packing: input_str_frame#add () in
 
   (*turing machine page - hboxes to hold entries*)
-  let box_entry_str        = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10
+  let box_entry_str        = GPack.hbox ~height: 30 ~width: 100 ~spacing: 10
     ~homogeneous: true ~packing: vbox_inputs#add    () in
-(*   let box_entry_num_input  = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10
-    ~homogeneous: true ~packing: vbox_inputs#add        () in *)
-  let box_entry_num_states = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10
+  let box_entry_num_input  = GPack.hbox ~height: 30 ~width: 100 ~spacing: 10
     ~homogeneous: true ~packing: vbox_inputs#add        () in
-  let box_make_matrix      = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10
+  let box_entry_num_states = GPack.hbox ~height: 30 ~width: 100 ~spacing: 10
+    ~homogeneous: true ~packing: vbox_inputs#add        () in
+  let box_make_matrix      = GPack.hbox ~height: 30 ~width: 100 ~spacing: 10
     ~homogeneous: true ~packing: vbox_inputs#add        () in
   let box_trans_matrix = GPack.vbox ~border_width: 5
     ~packing: vbox_turing#add () in window#connect#destroy ~callback:Main.quit;
@@ -476,15 +476,15 @@ let main () =
   (*turing machine page - entries*)
   let entry_string = GEdit.entry ~packing:box_entry_str#add () in
   (* let entry_transition = GEdit.entry ~packing:box_entry_trans#add () in *)
-  (* let entry_num_input = GEdit.entry ~packing:box_entry_num_input#add () in *)
+  let entry_num_input = GEdit.entry ~packing:box_entry_num_input#add () in
   let entry_num_states = GEdit.entry ~packing:box_entry_num_states#add () in
 
   (*turing machine page - buttons*)
   (*TODO make the formatting of this better looking*)
-(*   let button_entry_num_input = GButton.button
+  let button_entry_num_input = GButton.button
     ~label:"input number of input alphabet" ~packing:box_entry_num_input#add ()
     in button_entry_num_input#connect#clicked
-    (fun () -> prerr_endline entry_num_input#text); *)
+    (fun () -> prerr_endline entry_num_input#text);
   let button_entry_num_states = GButton.button
     ~label:"input number of states"         ~packing:box_entry_num_states#add ()
     in button_entry_num_states#connect#clicked
@@ -493,7 +493,7 @@ let main () =
     ~label:"make matrix"                    ~packing:box_make_matrix#add      ()
     in button_make_matrix#connect#clicked
     (fun () -> make_matrix box_trans_matrix#pack entry_num_states#text
-      "2" ["hello"]) ;
+      entry_num_input#text ["hello"]) ;
 
   (*turing machine page - turing machine box*)
   let box_turing = GPack.vbox ~packing: vbox_turing#pack () in
@@ -506,6 +506,7 @@ let main () =
   let button_entry_str = GButton.button ~label:"input string"
     ~packing:box_entry_str#add () in button_entry_str#connect#clicked
     (fun () -> make_turing_machine
+     (* turing_frame#add entry_string#text); *)
      turing_scroll_window#add_with_viewport entry_string#text);
   let box_step = GPack.hbox ~height: 20 ~width: 100 ~spacing: 10
     ~packing: box_turing#pack () in
