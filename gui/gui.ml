@@ -1,6 +1,7 @@
 open Test_a
 open GMain
 open GdkKeysyms
+open Regex 
 
 (* open Machine *)
 
@@ -9,6 +10,8 @@ let locale = GtkMain.Main.init ()
 (* How to Run
  * ocamlfind ocamlc -g -package lablgtk2 -linkpkg test_a.mli test_a.ml gui.mli gui.ml -o gui
  * ./gui*)
+
+(* ocamlc -g -I /Users/alicepham/lablgtk-2.18.5/src -o boop lablgtk.cma gtkInit.cmo test_a.ml gui.ml *)
 
 (************************Turing Machine Helpers********************************)
 
@@ -387,6 +390,7 @@ let main () =
     encrypt_button#connect#clicked
     ~callback: (fun () -> make_step_one_encrypt 
       (vbox_regex_page#pack ~expand: false));
+    
 
 
   window#show ();
