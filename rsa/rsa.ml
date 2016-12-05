@@ -2,12 +2,12 @@ open Random
 (*-----------Evalutation-----------*)
 
 (*Key generation*)
-let p = "41"
-let q = "83"
-let n = "3403"
-let phi = "3280"
-let public_key = "17"
-let private_key = "193"
+let p = ref "41"
+let q = ref "83"
+let n = ref "3403"
+let phi = ref "3280"
+let public_key = ref "17"
+let private_key = ref "193"
 
 (* [string_to_list s ] Transforms string [s] into a list of  characters in [s]
  * Requires:
