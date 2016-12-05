@@ -1,11 +1,13 @@
+open Test_a
 open GMain
 open GdkKeysyms
+
 (* open Machine *)
 
 let locale = GtkMain.Main.init ()
 
 (* How to Run
- * ocamlfind ocamlc -g -package lablgtk2 -linkpkg gui.ml -o gui
+ * ocamlfind ocamlc -g -package lablgtk2 -linkpkg test_a.mli test_a.ml gui.mli gui.ml -o gui
  * ./gui*)
 
 (************************Turing Machine Helpers********************************)
@@ -44,12 +46,12 @@ let make_str_input packing (make_entry : (GObj.widget -> unit) -> GEdit.entry) =
 (* [string_to_list s] is a helper function that seperates a string 
  * into a string list of the individual characters in that string.
  *)
-let string_to_list (s: string) =
+(* let string_to_list (s: string) =
   let rec helper c len = 
     if c = len then []
     else (String.get s c)::(helper (c+1) len)
   in 
-  helper 0 (String.length s)
+  helper 0 (String.length s) *)
   
 (* [list_to_string l] is a helper function for debugging purposes, called
  * to print the contents of the transition matrix/dictionary
@@ -361,6 +363,31 @@ let main () =
    *         (fun () -> make_turing_machine 
    *         turing_scroll_window#add_with_viewport entry_string#text);
    *)
+
+  (*Page 4 - Regex Simplification*)
+  let vbox_regex_page = GPack.vbox ~spacing: 5
+    ~packing:(fun w -> ignore (notebook#append_page w)) () in
+
+  let frame_input_regex = GBin.frame ~label: "Input Regex" ~height: 60
+    ~packing: (vbox_regex_page#pack ~expand: false) () in
+
+(*   let hbox_input_regex = GPack.hbox ~height: 40
+    ~packing: (vbox_regex_page#pack ~expand: false) () in *)
+  let entry_input_regex = GEdit.entry ~height: 30 
+    ~packing: frame_input_regex#add () in
+  let frame_output_regex = GBin.frame ~label: "Output Regex" ~height: 60
+    ~packing: (vbox_regex_page#pack ~expand: false) () in
+(*   let hbox_output_regex = GPack.hbox ~height: 40
+    ~packing: (vbox_regex_page#pack ~expand: false) () in     *)
+  let entry_output_regex = GEdit.entry ~height: 30 
+    ~packing: frame_output_regex#add () in
+
+  let encrypt_button = GButton.button ~label: "encrypt message" 
+    ~packing: (hbox_p_q#pack ~expand: false ~fill: true) () in
+    encrypt_button#connect#clicked
+    ~callback: (fun () -> make_step_one_encrypt 
+      (vbox_regex_page#pack ~expand: false));
+
 
   window#show ();
   Main.main ()
