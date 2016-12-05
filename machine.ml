@@ -3,7 +3,8 @@ type direction = Left | Right
 
 type state =  Q of int | None
 
-type transition_function = state * string * state *string * direction list
+type transition_function = {state : state; input_char:string;
+                            direction : direction}
 
 type machine = {all_states : state list ; prev_state : state ;
                curr_state: state; next_state : state ; alphabet : string list ;
@@ -81,3 +82,19 @@ let step mach =
                 find_next_state ((position mach matrix)+1) matrix;
                 alphabet = remove_dups(get_alphabet matrix) ;
                 tape_char = y}
+
+let lst_to_record lst =
+  match lst with
+  | [x;y;z] -> {state = x ; input_char = y; direction = z}
+  | _ -> raise (Failure "invalid list")
+
+let parse str =
+  let components = Str.split(Str.regexp "[ |,|(|)|q|_]") str in
+  let filtered = List.filter (fun x -> x <>"") components in
+  match filtered with
+  | [x;y;z] -> if z = Left then  lst_to_record[Q x;y;Left]
+               else lst_to_record[Q x;y;Right]
+  | _ -> raise (Failure "Invalid entry in transition matrix")
+
+
+
